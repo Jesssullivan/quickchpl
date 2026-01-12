@@ -25,7 +25,10 @@ proc main() {
   var prop = property(
     "addition is commutative",
     gen,
-    proc((a, b): (int, int)) { return a + b == b + a; }
+    proc(args: (int, int)) {
+      const (a, b) = args;
+      return a + b == b + a;
+    }
   );
 
   var result = check(prop);
@@ -123,11 +126,13 @@ assert(result.passed);
 
 ```chapel
 // Property only checked when condition is true
+// (implies is available from quickchpl module)
 var prop = property(
   "division by non-zero",
   tupleGen(intGen(), intGen()),
-  proc((a, b): (int, int)) {
-    return (b != 0) ==> (a / b * b == a - a % b);
+  proc(args: (int, int)) {
+    const (a, b) = args;
+    return implies(b != 0, a / b * b == a - a % b);
   }
 );
 ```
@@ -144,40 +149,81 @@ var result = forAll(intGen(), proc(x: int) { return x * 1 == x; });
 
 ## Property Patterns
 
-The `Patterns` module provides reusable property templates:
+The `Patterns` module provides reusable **predicate functions** for testing common properties.
+All pattern predicates are available when you `use quickchpl;`.
 
 ### Algebraic Patterns
 
 ```chapel
-use quickchpl.Patterns;
+// Test that addition is commutative
+var prop = property(
+  "addition is commutative",
+  tupleGen(intGen(-100, 100), intGen(-100, 100)),
+  proc(args: (int, int)) {
+    const (a, b) = args;
+    return isCommutative(a, b, proc(x: int, y: int) { return x + y; });
+  }
+);
 
-// Test algebraic properties of addition
-var gen = intGen(-100, 100);
+// Or use ready-made predicates for integers
+var commProp = property(
+  "integer addition commutes",
+  tupleGen(intGen(), intGen()),
+  proc(args: (int, int)) {
+    const (a, b) = args;
+    return intAddCommutative(a, b);
+  }
+);
 
-var commProp = commutativeProperty("addition", gen,
-  proc(a: int, b: int) { return a + b; });
+// Test associativity
+var assocProp = property(
+  "addition is associative",
+  tupleGen(intGen(), intGen(), intGen()),
+  proc(args: (int, int, int)) {
+    const (a, b, c) = args;
+    return intAddAssociative(a, b, c);
+  }
+);
 
-var assocProp = associativeProperty("addition", gen,
-  proc(a: int, b: int) { return a + b; });
-
-var idProp = identityProperty("addition", gen,
-  proc(a: int, b: int) { return a + b; }, 0);
+// Test identity element
+var idProp = property(
+  "zero is additive identity",
+  intGen(),
+  proc(a: int) { return intAddIdentity(a); }
+);
 ```
 
 ### Functional Patterns
 
 ```chapel
 // Idempotence: f(f(x)) = f(x)
-var idempProp = idempotentProperty("abs", intGen(), abs);
+var idempProp = property(
+  "abs is idempotent",
+  intGen(),
+  proc(x: int) {
+    return isIdempotent(x, proc(n: int) { return abs(n); });
+  }
+);
 
 // Involution: f(f(x)) = x
-var involudProp = involutionProperty("negate", intGen(),
-  proc(x: int) { return -x; });
+var invProp = property(
+  "negation is involution",
+  intGen(),
+  proc(x: int) {
+    return isInvolution(x, proc(n: int) { return -n; });
+  }
+);
 
 // Round-trip: decode(encode(x)) = x
-var roundTripProp = roundTripProperty("int<->string", intGen(),
-  proc(x: int) { return x:string; },
-  proc(s: string) { return s:int; }
+var roundTripProp = property(
+  "int<->string round-trip",
+  intGen(),
+  proc(x: int) {
+    return isRoundTrip(x,
+      proc(n: int) { return n:string; },
+      proc(s: string): int { return try! s:int; catch { return 0; } }
+    );
+  }
 );
 ```
 
