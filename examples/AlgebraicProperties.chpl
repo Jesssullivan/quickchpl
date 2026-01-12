@@ -2,11 +2,7 @@
 // Demonstrates testing algebraic laws using the Patterns library
 
 module AlgebraicProperties {
-  use Generators;
-  use Combinators;
-  use Properties;
-  use Reporters;
-  use Patterns;
+  use quickchpl;
 
   proc main() {
     writeln("quickchpl Algebraic Properties Example");

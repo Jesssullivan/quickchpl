@@ -2,10 +2,7 @@
 // This example demonstrates basic property-based testing with quickchpl
 
 module GettingStarted {
-  use Generators;
-  use Combinators;
-  use Properties;
-  use Reporters;
+  use quickchpl;
 
   proc main() {
     writeln("quickchpl Getting Started Example");
@@ -19,7 +16,7 @@ module GettingStarted {
       var prop = property(
         "addition is commutative",
         gen,
-        proc((a, b): (int, int)) { return a + b == b + a; }
+        proc(args: (int, int)) { const (a, b) = args; return a + b == b + a; }
       );
 
       var result = check(prop);
@@ -35,7 +32,7 @@ module GettingStarted {
       var prop = property(
         "multiplication is associative",
         gen,
-        proc((a, b, c): (int, int, int)) { return (a * b) * c == a * (b * c); }
+        proc(args: (int, int, int)) { const (a, b, c) = args; return (a * b) * c == a * (b * c); }
       );
 
       var result = check(prop);

@@ -2,10 +2,7 @@
 // Tests for property definition and test runner
 
 module PropertyTests {
-  use Generators;
-  use Combinators;
-  use Properties;
-  use Patterns;
+  use quickchpl;  // Import main module for quickCheck
   use List;
 
   config const numTests = 50;

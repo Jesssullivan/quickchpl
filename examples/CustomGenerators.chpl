@@ -2,10 +2,7 @@
 // Demonstrates creating generators for custom types
 
 module CustomGenerators {
-  use Generators;
-  use Combinators;
-  use Properties;
-  use Reporters;
+  use quickchpl;
   use List;
   use Random;
 
@@ -26,7 +23,7 @@ module CustomGenerators {
   proc pointGen(minCoord: int = -100, maxCoord: int = 100) {
     return map(
       tupleGen(intGen(minCoord, maxCoord), intGen(minCoord, maxCoord)),
-      proc((x, y): (int, int)) { return new Point(x, y); }
+      proc(args: (int, int)) { const (x, y) = args; return new Point(x, y); }
     );
   }
 
@@ -51,7 +48,7 @@ module CustomGenerators {
   proc rectangleGen(maxDim: int = 100) {
     return map(
       tupleGen(positiveIntGen(maxDim), positiveIntGen(maxDim)),
-      proc((w, h): (int, int)) { return new Rectangle(w, h); }
+      proc(args: (int, int)) { const (w, h) = args; return new Rectangle(w, h); }
     );
   }
 
