@@ -12,4 +12,4 @@ keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
 # No external dependencies - pure Chapel uWu
 
 [dev-dependencies]
-# chplcheck needed
+# chplcheck would be good here
