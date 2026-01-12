@@ -130,14 +130,43 @@ jobs:
   lint:
     name: Code Quality
     runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Run chplcheck
+        run: |
+          echo "Running chplcheck linter..."
+          chplcheck --version || echo "chplcheck version unknown"
+          chplcheck src/*.chpl test/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
+          cat chplcheck.log
+
+          # Count violations (excluding intentional API design decisions)
+          VIOLATIONS=$(grep -c "violates rule" chplcheck.log || true)
+          echo ""
+          echo "=== chplcheck Summary ==="
+          echo "Total violations: $VIOLATIONS"
+          echo ""
+
+          # Known acceptable violations:
+          # - 8 CamelCaseRecords (generator types - intentional API)
+          # - 21 UnusedLoopIndex (_unused variable - Chapel limitation)
+          # - 1 PascalCaseModules (quickchpl - package name)
+          ACCEPTABLE=30
+
+          if [ "$VIOLATIONS" -gt "$ACCEPTABLE" ]; then
+            echo "❌ Too many chplcheck violations (expected <=$ACCEPTABLE, got $VIOLATIONS)"
+            exit 1
+          else
+            echo "✅ chplcheck passed (acceptable violations: $VIOLATIONS/$ACCEPTABLE)"
+          fi
+
       - name: Check for trailing whitespace
         run: |
           echo "Checking for trailing whitespace..."
-          ! grep -rn '[[:space:]]$' src/*.chpl tests/*.chpl examples/*.chpl || {
+          ! grep -rn '[[:space:]]$' src/*.chpl test/*.chpl examples/*.chpl || {
             echo "Found trailing whitespace"
             exit 1
           }
@@ -145,7 +174,7 @@ jobs:
       - name: Check file permissions
         run: |
           echo "Checking execute permissions on source files..."
-          find src tests examples -name "*.chpl" -perm +111 && {
+          find src test examples -name "*.chpl" -perm +111 && {
             echo "Found executable .chpl files (should not be executable)"
             exit 1
           } || echo "✓ No executable .chpl files found"

@@ -2,7 +2,8 @@
   Properties Module
   =================
 
-  Property definition, execution, and result handling for property-based testing.
+  Property definition, execution, and result handling for
+  property-based testing.
 
   This module provides the core framework for defining and running properties.
   A property combines a generator with a predicate function, and the framework
@@ -128,9 +129,10 @@ module Properties {
       :arg shrinkSteps: Shrinking iterations
       :arg duration: Execution time
     */
-    proc init(passed: bool, numTests: int, numPassed: int, numFailed: int,
-              propertyName: string, failureInfo: string = "",
-              shrunkInfo: string = "", shrinkSteps: int = 0, duration: real = 0.0) {
+    proc init(passed: bool, numTests: int, numPassed: int,
+              numFailed: int, propertyName: string,
+              failureInfo: string = "", shrunkInfo: string = "",
+              shrinkSteps: int = 0, duration: real = 0.0) {
       this.passed = passed;
       this.numTests = numTests;
       this.numPassed = numPassed;
@@ -269,7 +271,7 @@ module Properties {
       var firstFailure: string = "";
       var hasFailure = false;
 
-      // Run tests sequentially for now (parallel requires more careful handling)
+      // Run tests sequentially (parallel requires careful handling)
       for i in 1..numTests {
         const testCase = prop.generator.next();
 
@@ -291,11 +293,17 @@ module Properties {
         } catch e {
           failed += 1;
           if !hasFailure {
-            try { firstFailure = "%? (exception: %s)".format(testCase, e.message()); }
-            catch { firstFailure = "<value> (exception: " + e.message() + ")"; }
+            try {
+              firstFailure = "%? (exception: %s)".format(testCase,
+                                                          e.message());
+            }
+            catch {
+              firstFailure = "<value> (exception: " + e.message() + ")";
+            }
             hasFailure = true;
           }
-          if verboseMode then writeln("  Test ", i, ": EXCEPTION - ", e.message());
+          if verboseMode then
+            writeln("  Test ", i, ": EXCEPTION - ", e.message());
           if !verboseMode then break;
         }
       }

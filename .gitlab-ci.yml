@@ -5,6 +5,7 @@ image: chapel/chapel:2.6.0
 
 stages:
   - build
+  - lint
   - test
   - docs
   - publish
@@ -30,6 +31,63 @@ build:
     # Verify all modules compile together
     - chpl -M src --no-codegen src/quickchpl.chpl
     - echo "✓ All modules compile successfully"
+
+# ============================================
+# Lint Stage
+# ============================================
+
+lint:chplcheck:
+  stage: lint
+  script:
+    - echo "Running chplcheck linter..."
+    - chplcheck --version || echo "chplcheck version unknown"
+    - chplcheck src/*.chpl test/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
+    - cat chplcheck.log
+    - |
+      # Count violations (excluding intentional API design decisions)
+      VIOLATIONS=$(grep -c "violates rule" chplcheck.log || true)
+      echo ""
+      echo "=== chplcheck Summary ==="
+      echo "Total violations: $VIOLATIONS"
+      echo ""
+
+      # Known acceptable violations:
+      # - 8 CamelCaseRecords (generator types - intentional API)
+      # - 21 UnusedLoopIndex (_unused variable - Chapel limitation)
+      # - 1 PascalCaseModules (quickchpl - package name)
+      ACCEPTABLE=30
+
+      if [ "$VIOLATIONS" -gt "$ACCEPTABLE" ]; then
+        echo "❌ Too many chplcheck violations (expected <=$ACCEPTABLE, got $VIOLATIONS)"
+        exit 1
+      else
+        echo "✅ chplcheck passed (acceptable violations: $VIOLATIONS/$ACCEPTABLE)"
+      fi
+  artifacts:
+    paths:
+      - chplcheck.log
+    expire_in: 1 week
+    when: always
+
+lint:whitespace:
+  stage: lint
+  script:
+    - echo "Checking for trailing whitespace..."
+    - |
+      ! grep -rn '[[:space:]]$' src/*.chpl test/*.chpl examples/*.chpl || {
+        echo "Found trailing whitespace"
+        exit 1
+      }
+
+lint:permissions:
+  stage: lint
+  script:
+    - echo "Checking execute permissions on source files..."
+    - |
+      find src test examples -name "*.chpl" -perm +111 && {
+        echo "Found executable .chpl files (should not be executable)"
+        exit 1
+      } || echo "✓ No executable .chpl files found"
 
 # ============================================
 # Test Stage

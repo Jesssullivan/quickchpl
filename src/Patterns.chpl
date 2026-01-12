@@ -47,7 +47,8 @@
     var prop = property("add commutes",
                         tupleGen(intGen(), intGen()),
                         lambda((a, b): (int, int)) {
-                          return isCommutative(a, b, lambda(x: int, y: int) { return x + y; });
+                          return isCommutative(a, b,
+                            lambda(x: int, y: int) { return x + y; });
                         });
 */
 module Patterns {
@@ -72,7 +73,8 @@ module Patterns {
     Example::
 
       // Test addition associativity
-      var result = isAssociative(1, 2, 3, lambda(x: int, y: int) { return x + y; });
+      var result = isAssociative(1, 2, 3,
+        lambda(x: int, y: int) { return x + y; });
       // (1 + 2) + 3 = 1 + (2 + 3) = 6, so result is true
   */
   proc isAssociative(a, b, c, op): bool {

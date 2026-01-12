@@ -6,6 +6,7 @@ chplVersion = "2.6.0..2.8.0"
 license = "MIT"
 authors = ["Jess Sullivan <jess@sulliwood.org>"]
 repository = "https://github.com/Jesssullivan/quickchpl"
+source = "https://github.com/Jesssullivan/quickchpl"
 description = "A simple property-based testing library for Chapel"
 keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
 
@@ -13,4 +14,5 @@ keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
 # No external dependencies - pure Chapel uWu
 
 [dev-dependencies]
-# chplcheck would be good here
+# chplcheck is required for linting (installed with Chapel)
+# Run with: chplcheck src/*.chpl test/*.chpl examples/*.chpl

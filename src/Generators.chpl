@@ -71,7 +71,8 @@ module Generators {
   config const defaultMaxArrayLen = 100;
 
   /* Default character set for string generation. */
-  param DEFAULT_CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  param DEFAULT_CHARSET =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
   /*
     Statistical distributions for real number generation.
@@ -121,7 +122,7 @@ module Generators {
     :var max: Maximum value (inclusive)
     :var rng: Internal random stream
   */
-  record IntGenerator {
+  record intGenerator {
     var min: int;
     var max: int;
     var rng: randomStream(int);
@@ -133,7 +134,8 @@ module Generators {
       :arg max: Maximum value (inclusive)
       :arg seed: Random seed (-1 for random)
     */
-    proc init(min: int = defaultMinInt, max: int = defaultMaxInt, seed: int = -1) {
+    proc init(min: int = defaultMinInt, max: int = defaultMaxInt,
+              seed: int = -1) {
       this.min = min;
       this.max = max;
       if seed >= 0 {
@@ -162,7 +164,7 @@ module Generators {
       :yields: Random integers in [min, max]
     */
     iter these(n: int = 100) ref : int {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -181,8 +183,9 @@ module Generators {
       var gen = intGen(-10, 10);
       var value = gen.next();  // Random int in [-10, 10]
   */
-  proc intGen(min: int = defaultMinInt, max: int = defaultMaxInt, seed: int = -1): IntGenerator {
-    return new IntGenerator(min, max, seed);
+  proc intGen(min: int = defaultMinInt, max: int = defaultMaxInt,
+              seed: int = -1): intGenerator {
+    return new intGenerator(min, max, seed);
   }
 
   /*
@@ -196,8 +199,8 @@ module Generators {
 
       var gen = natGen(100);  // Generates 0..100
   */
-  proc natGen(max: int = defaultMaxInt, seed: int = -1): IntGenerator {
-    return new IntGenerator(0, max, seed);
+  proc natGen(max: int = defaultMaxInt, seed: int = -1): intGenerator {
+    return new intGenerator(0, max, seed);
   }
 
   /*
@@ -211,8 +214,9 @@ module Generators {
 
       var gen = positiveIntGen(100);  // Generates 1..100
   */
-  proc positiveIntGen(max: int = defaultMaxInt, seed: int = -1): IntGenerator {
-    return new IntGenerator(1, max, seed);
+  proc positiveIntGen(max: int = defaultMaxInt,
+                      seed: int = -1): intGenerator {
+    return new intGenerator(1, max, seed);
   }
 
   /*
@@ -233,7 +237,7 @@ module Generators {
     :var distribution: Statistical distribution to use
     :var rng: Internal random stream
   */
-  record RealGenerator {
+  record realGenerator {
     var minVal: real;
     var maxVal: real;
     var distribution: Distribution;
@@ -247,8 +251,10 @@ module Generators {
       :arg distribution: Distribution type (Uniform, Normal, Exponential)
       :arg seed: Random seed (-1 for random)
     */
-    proc init(minVal: real = defaultMinReal, maxVal: real = defaultMaxReal,
-              distribution: Distribution = Distribution.Uniform, seed: int = -1) {
+    proc init(minVal: real = defaultMinReal,
+              maxVal: real = defaultMaxReal,
+              distribution: Distribution = Distribution.Uniform,
+              seed: int = -1) {
       this.minVal = minVal;
       this.maxVal = maxVal;
       this.distribution = distribution;
@@ -307,7 +313,7 @@ module Generators {
       :yields: Random reals in [minVal, maxVal]
     */
     iter these(n: int = 100) ref : real {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -330,9 +336,11 @@ module Generators {
       // Normal distribution (Gaussian)
       var normal = realGen(-1.0, 1.0, Distribution.Normal);
   */
-  proc realGen(minVal: real = defaultMinReal, maxVal: real = defaultMaxReal,
-               distribution: Distribution = Distribution.Uniform, seed: int = -1): RealGenerator {
-    return new RealGenerator(minVal, maxVal, distribution, seed);
+  proc realGen(minVal: real = defaultMinReal,
+               maxVal: real = defaultMaxReal,
+               distribution: Distribution = Distribution.Uniform,
+               seed: int = -1): realGenerator {
+    return new realGenerator(minVal, maxVal, distribution, seed);
   }
 
   /*
@@ -346,8 +354,8 @@ module Generators {
       var gen = unitRealGen();
       var prob = gen.next();  // Random probability
   */
-  proc unitRealGen(seed: int = -1): RealGenerator {
-    return new RealGenerator(0.0, 1.0, Distribution.Uniform, seed);
+  proc unitRealGen(seed: int = -1): realGenerator {
+    return new realGenerator(0.0, 1.0, Distribution.Uniform, seed);
   }
 
   /*
@@ -365,7 +373,7 @@ module Generators {
     :var trueProb: Probability of generating true (0.0 to 1.0)
     :var rng: Internal random stream
   */
-  record BoolGenerator {
+  record boolGenerator {
     var trueProb: real;
     var rng: randomStream(real);
 
@@ -400,7 +408,7 @@ module Generators {
       :yields: Random boolean values
     */
     iter these(n: int = 100) ref : bool {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -421,8 +429,8 @@ module Generators {
       // Biased: 80% true
       var biased = boolGen(0.8);
   */
-  proc boolGen(trueProb: real = 0.5, seed: int = -1): BoolGenerator {
-    return new BoolGenerator(trueProb, seed);
+  proc boolGen(trueProb: real = 0.5, seed: int = -1): boolGenerator {
+    return new boolGenerator(trueProb, seed);
   }
 
   /*
@@ -443,7 +451,7 @@ module Generators {
     :var charset: Characters to choose from
     :var rng: Internal random stream
   */
-  record StringGenerator {
+  record stringGenerator {
     var minLen: int;
     var maxLen: int;
     var charset: string;
@@ -483,7 +491,7 @@ module Generators {
       var result: string;
       const charsetLen = charset.size;
 
-      for i in 1..len {
+      for _unused in 1..len {
         const idx = abs(rng.next()) % charsetLen;
         result += charset[idx];
       }
@@ -498,7 +506,7 @@ module Generators {
       :yields: Random strings
     */
     iter these(n: int = 100) ref : string {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -522,8 +530,9 @@ module Generators {
       var hexGen = stringGen(8, 8, "0123456789abcdef");
   */
   proc stringGen(minLen: int = 0, maxLen: int = defaultMaxStringLen,
-                 charset: string = DEFAULT_CHARSET, seed: int = -1): StringGenerator {
-    return new StringGenerator(minLen, maxLen, charset, seed);
+                 charset: string = DEFAULT_CHARSET,
+                 seed: int = -1): stringGenerator {
+    return new stringGenerator(minLen, maxLen, charset, seed);
   }
 
   /*
@@ -534,8 +543,11 @@ module Generators {
     :arg seed: Random seed (-1 for random)
     :returns: StringGenerator with letters only (a-z, A-Z)
   */
-  proc alphaGen(minLen: int = 0, maxLen: int = defaultMaxStringLen, seed: int = -1): StringGenerator {
-    return new StringGenerator(minLen, maxLen, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", seed);
+  proc alphaGen(minLen: int = 0, maxLen: int = defaultMaxStringLen,
+                seed: int = -1): stringGenerator {
+    return new stringGenerator(minLen, maxLen,
+                                "abcdefghijklmnopqrstuvwxyz" +
+                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ", seed);
   }
 
   /*
@@ -546,8 +558,9 @@ module Generators {
     :arg seed: Random seed (-1 for random)
     :returns: StringGenerator with letters and digits
   */
-  proc alphaNumGen(minLen: int = 0, maxLen: int = defaultMaxStringLen, seed: int = -1): StringGenerator {
-    return new StringGenerator(minLen, maxLen, DEFAULT_CHARSET, seed);
+  proc alphaNumGen(minLen: int = 0, maxLen: int = defaultMaxStringLen,
+                   seed: int = -1): stringGenerator {
+    return new stringGenerator(minLen, maxLen, DEFAULT_CHARSET, seed);
   }
 
   /*
@@ -562,8 +575,10 @@ module Generators {
 
       var gen = numericStringGen(10, 10);  // 10-digit numbers
   */
-  proc numericStringGen(minLen: int = 0, maxLen: int = defaultMaxStringLen, seed: int = -1): StringGenerator {
-    return new StringGenerator(minLen, maxLen, "0123456789", seed);
+  proc numericStringGen(minLen: int = 0,
+                        maxLen: int = defaultMaxStringLen,
+                        seed: int = -1): stringGenerator {
+    return new stringGenerator(minLen, maxLen, "0123456789", seed);
   }
 
   /*
@@ -583,7 +598,7 @@ module Generators {
     :var gen1: First generator
     :var gen2: Second generator
   */
-  record Tuple2Generator {
+  record tuple2Generator {
     type T1;
     type T2;
     var gen1: T1;
@@ -605,7 +620,7 @@ module Generators {
       :yields: 2-tuples of generated values
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -623,7 +638,7 @@ module Generators {
     :var gen2: Second generator
     :var gen3: Third generator
   */
-  record Tuple3Generator {
+  record tuple3Generator {
     type T1;
     type T2;
     type T3;
@@ -647,7 +662,7 @@ module Generators {
       :yields: 3-tuples of generated values
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -667,7 +682,7 @@ module Generators {
       var (x, flag) = gen.next();
   */
   proc tupleGen(gen1, gen2) {
-    return new Tuple2Generator(gen1.type, gen2.type, gen1, gen2);
+    return new tuple2Generator(gen1.type, gen2.type, gen1, gen2);
   }
 
   /*
@@ -684,7 +699,8 @@ module Generators {
       var gen = tupleGen(intGen(), intGen(), intGen());
   */
   proc tupleGen(gen1, gen2, gen3) {
-    return new Tuple3Generator(gen1.type, gen2.type, gen3.type, gen1, gen2, gen3);
+    return new tuple3Generator(gen1.type, gen2.type, gen3.type,
+                                gen1, gen2, gen3);
   }
 
   /*
@@ -706,7 +722,7 @@ module Generators {
     :var maxSize: Maximum list length
     :var rng: Internal random stream for size selection
   */
-  record ListGenerator {
+  record listGenerator {
     type ElemGenType;
     var elemGen: ElemGenType;
     var minSize: int;
@@ -723,7 +739,8 @@ module Generators {
       :arg seed: Random seed (-1 for random)
     */
     proc init(type ElemGenType, elemGen: ElemGenType,
-              minSize: int = 0, maxSize: int = defaultMaxArrayLen, seed: int = -1) {
+              minSize: int = 0, maxSize: int = defaultMaxArrayLen,
+              seed: int = -1) {
       this.ElemGenType = ElemGenType;
       this.elemGen = elemGen;
       this.minSize = minSize;
@@ -745,7 +762,7 @@ module Generators {
                    else minSize + abs(rng.next()) % (maxSize - minSize + 1);
 
       var result: list(elemGen.next().type);
-      for i in 1..size {
+      for _unused in 1..size {
         result.pushBack(elemGen.next());
       }
       return result;
@@ -758,7 +775,7 @@ module Generators {
       :yields: Random lists
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -779,8 +796,9 @@ module Generators {
       var gen = listGen(intGen(-100, 100), 1, 10);
       var numbers = gen.next();  // list(int) with 1-10 elements
   */
-  proc listGen(elemGen, minSize: int = 0, maxSize: int = defaultMaxArrayLen, seed: int = -1) {
-    return new ListGenerator(elemGen.type, elemGen, minSize, maxSize, seed);
+  proc listGen(elemGen, minSize: int = 0,
+               maxSize: int = defaultMaxArrayLen, seed: int = -1) {
+    return new listGenerator(elemGen.type, elemGen, minSize, maxSize, seed);
   }
 
   /*
@@ -799,7 +817,7 @@ module Generators {
     :type T: Type of the constant value
     :var value: The constant value to return
   */
-  record ConstantGenerator {
+  record constantGenerator {
     type T;
     var value: T;
 
@@ -829,7 +847,7 @@ module Generators {
       :yields: The constant value
     */
     iter these(n: int = 100): T {
-      for i in 1..n {
+      for _unused in 1..n {
         yield value;
       }
     }
@@ -850,7 +868,7 @@ module Generators {
       var gen = oneOf(intGen(), constantGen(0));  // Include 0 as edge case
   */
   proc constantGen(value) {
-    return new ConstantGenerator(value);
+    return new constantGenerator(value);
   }
 
   /*
@@ -870,7 +888,7 @@ module Generators {
     :var elements: List of values to choose from
     :var rng: Internal random stream
   */
-  record ElementsGenerator {
+  record elementsGenerator {
     type T;
     var elements: list(T);
     var rng: randomStream(int);
@@ -911,7 +929,7 @@ module Generators {
       :yields: Randomly selected elements
     */
     iter these(n: int = 100) ref : T {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -935,6 +953,6 @@ module Generators {
       var color = gen.next();  // "red", "green", or "blue"
   */
   proc elementsGen(elements: list(?T), seed: int = -1) {
-    return new ElementsGenerator(T, elements, seed);
+    return new elementsGenerator(T, elements, seed);
   }
 }

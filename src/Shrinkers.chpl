@@ -147,7 +147,8 @@ module Shrinkers {
 
     Example::
 
-      var (minimal, steps) = shrinkIntFailure(1000, lambda(x: int) { return x < 50; });
+      var (minimal, steps) = shrinkIntFailure(1000,
+        lambda(x: int) { return x < 50; });
       // minimal = 50, the smallest value where pred returns false
   */
   proc shrinkIntFailure(value: int, pred, maxSteps: int = 1000): (int, int) {

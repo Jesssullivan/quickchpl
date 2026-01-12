@@ -61,7 +61,7 @@ module Combinators {
     :var baseGen: Base generator
     :var mapperFn: Transformation function
   */
-  record MappedGenerator {
+  record mappedGenerator {
     type BaseGenType;
     type OutputType;
     var baseGen: BaseGenType;
@@ -96,7 +96,7 @@ module Combinators {
       :yields: Transformed values
     */
     iter these(n: int = 100) ref : OutputType {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -118,7 +118,7 @@ module Combinators {
       // Produces: 1, 4, 9, 16, 25, ...
   */
   proc map(gen, fn) {
-    return new MappedGenerator(gen, fn);
+    return new mappedGenerator(gen, fn);
   }
 
   /*
@@ -140,7 +140,7 @@ module Combinators {
     :var predicateFn: Filter predicate (returns true to keep)
     :var maxRetries: Maximum attempts before halting
   */
-  record FilteredGenerator {
+  record filteredGenerator {
     type BaseGenType;
     type OutputType;
     var baseGen: BaseGenType;
@@ -175,7 +175,8 @@ module Combinators {
         if predicateFn(value) then return value;
         retries += 1;
       }
-      halt("FilteredGenerator: exceeded ", maxRetries, " retries - predicate too restrictive");
+      halt("FilteredGenerator: exceeded ", maxRetries,
+           " retries - predicate too restrictive");
     }
 
     /*
@@ -185,7 +186,7 @@ module Combinators {
       :yields: Values matching predicate
     */
     iter these(n: int = 100) ref : OutputType {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -207,7 +208,7 @@ module Combinators {
       var evenGen = filter(intGen(), lambda(x: int) { return x % 2 == 0; });
   */
   proc filter(gen, pred, maxRetries: int = 100) {
-    return new FilteredGenerator(gen, pred, maxRetries);
+    return new filteredGenerator(gen, pred, maxRetries);
   }
 
   /*
@@ -225,7 +226,7 @@ module Combinators {
     :var gen1: First generator
     :var gen2: Second generator
   */
-  record ZipGenerator {
+  record zipGenerator {
     type Gen1Type;
     type Gen2Type;
     var gen1: Gen1Type;
@@ -260,7 +261,7 @@ module Combinators {
       :yields: 2-tuples of values
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -279,7 +280,7 @@ module Combinators {
       var (num, flag) = gen.next();
   */
   proc zipGen(gen1, gen2) {
-    return new ZipGenerator(gen1, gen2);
+    return new zipGenerator(gen1, gen2);
   }
 
   /*
@@ -299,7 +300,7 @@ module Combinators {
     :var gen2: Second generator
     :var gen3: Third generator
   */
-  record Zip3Generator {
+  record zip3Generator {
     type Gen1Type;
     type Gen2Type;
     type Gen3Type;
@@ -339,7 +340,7 @@ module Combinators {
       :yields: 3-tuples of values
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -354,7 +355,7 @@ module Combinators {
     :returns: Generator producing (T1, T2, T3) tuples
   */
   proc zipGen3(gen1, gen2, gen3) {
-    return new Zip3Generator(gen1, gen2, gen3);
+    return new zip3Generator(gen1, gen2, gen3);
   }
 
   /*
@@ -375,7 +376,7 @@ module Combinators {
     :var gen2: Second generator
     :var rng: Internal random stream
   */
-  record OneOf2Generator {
+  record oneOf2Generator {
     type Gen1Type;
     type Gen2Type;
     var gen1: Gen1Type;
@@ -408,8 +409,10 @@ module Combinators {
     */
     proc ref next() {
       const choice = abs(rng.next()) % 2;
-      if choice == 0 then return gen1.next();
-      else return gen2.next();
+      if choice == 0 then
+        return gen1.next();
+      else
+        return gen2.next();
     }
 
     /*
@@ -419,7 +422,7 @@ module Combinators {
       :yields: Values from randomly selected generators
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -436,7 +439,7 @@ module Combinators {
     :var gen3: Third generator
     :var rng: Internal random stream
   */
-  record OneOf3Generator {
+  record oneOf3Generator {
     type Gen1Type;
     type Gen2Type;
     type Gen3Type;
@@ -474,9 +477,12 @@ module Combinators {
     */
     proc ref next() {
       const choice = abs(rng.next()) % 3;
-      if choice == 0 then return gen1.next();
-      else if choice == 1 then return gen2.next();
-      else return gen3.next();
+      if choice == 0 then
+        return gen1.next();
+      else if choice == 1 then
+        return gen2.next();
+      else
+        return gen3.next();
     }
 
     /*
@@ -486,7 +492,7 @@ module Combinators {
       :yields: Values from randomly selected generators
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -506,7 +512,7 @@ module Combinators {
       var gen = oneOf(intGen(1, 100), intGen(-100, -1));
   */
   proc oneOf(gen1, gen2, seed: int = -1) {
-    return new OneOf2Generator(gen1, gen2, seed);
+    return new oneOf2Generator(gen1, gen2, seed);
   }
 
   /*
@@ -519,7 +525,7 @@ module Combinators {
     :returns: Generator that randomly picks from one of the three
   */
   proc oneOf(gen1, gen2, gen3, seed: int = -1) {
-    return new OneOf3Generator(gen1, gen2, gen3, seed);
+    return new oneOf3Generator(gen1, gen2, gen3, seed);
   }
 
   /*
@@ -543,7 +549,7 @@ module Combinators {
     :var gen2: Second generator
     :var rng: Internal random stream
   */
-  record Frequency2Generator {
+  record frequency2Generator {
     type Gen1Type;
     type Gen2Type;
     var weight1: int;
@@ -594,7 +600,7 @@ module Combinators {
       :yields: Values with weighted selection
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -616,7 +622,7 @@ module Combinators {
       var gen = frequency(9, intGen(-100, 100), 1, constantGen(0));
   */
   proc frequency(weight1: int, gen1, weight2: int, gen2, seed: int = -1) {
-    return new Frequency2Generator(weight1, gen1, weight2, gen2, seed);
+    return new frequency2Generator(weight1, gen1, weight2, gen2, seed);
   }
 
   /*
@@ -659,7 +665,7 @@ module Combinators {
     :var baseGen: Base generator
     :var scaleFactor: Multiplier for size parameter
   */
-  record ResizedGenerator {
+  record resizedGenerator {
     type BaseGenType;
     var baseGen: BaseGenType;
     var scaleFactor: real;
@@ -694,7 +700,7 @@ module Combinators {
       :yields: Values with scaled size
     */
     iter these(n: int = 100) ref {
-      for i in 1..n {
+      for _unused in 1..n {
         yield this.next();
       }
     }
@@ -710,7 +716,7 @@ module Combinators {
     :returns: Generator with scaled size parameter
   */
   proc resize(gen, scaleFactor: real) {
-    return new ResizedGenerator(gen, scaleFactor);
+    return new resizedGenerator(gen, scaleFactor);
   }
 
   /*

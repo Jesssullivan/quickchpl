@@ -32,7 +32,10 @@ module GettingStarted {
       var prop = property(
         "multiplication is associative",
         gen,
-        proc(args: (int, int, int)) { const (a, b, c) = args; return (a * b) * c == a * (b * c); }
+        proc(args: (int, int, int)) {
+          const (a, b, c) = args;
+          return (a * b) * c == a * (b * c);
+        }
       );
 
       var result = check(prop);
@@ -109,7 +112,8 @@ module GettingStarted {
     // Example 7: Using filter for even numbers
     writeln("Example 7: Even numbers are divisible by 2");
     {
-      var evenGen = filter(intGen(-100, 100), proc(x: int) { return x % 2 == 0; });
+      var evenGen = filter(intGen(-100, 100),
+                            proc(x: int) { return x % 2 == 0; });
       var prop = property(
         "even numbers divisible by 2",
         evenGen,

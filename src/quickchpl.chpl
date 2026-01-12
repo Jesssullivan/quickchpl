@@ -44,6 +44,7 @@
   :license: MIT
   :repository: https://github.com/Jesssullivan/chplcheck
 */
+// NOTE: Module name 'quickchpl' is intentionally lowercase (package name)
 module quickchpl {
   /*
     Configuration Constants

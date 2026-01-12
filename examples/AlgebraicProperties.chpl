@@ -18,14 +18,19 @@ module AlgebraicProperties {
 
       // Commutativity: a + b = b + a
       var commProp = property("integer addition is commutative", gen,
-        proc(args: (int, int)) { const (a, b) = args; return intAddCommutative(a, b); });
+        proc(args: (int, int)) {
+          const (a, b) = args; return intAddCommutative(a, b);
+        });
       var result1 = check(commProp);
       printResult(result1.passed, commProp.name, result1.numTests);
 
       // Associativity: (a + b) + c = a + (b + c)
-      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100), intGen(-100, 100));
+      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100),
+                          intGen(-100, 100));
       var assocProp = property("integer addition is associative", gen3,
-        proc(args: (int, int, int)) { const (a, b, c) = args; return intAddAssociative(a, b, c); });
+        proc(args: (int, int, int)) {
+          const (a, b, c) = args; return intAddAssociative(a, b, c);
+        });
       var result2 = check(assocProp);
       printResult(result2.passed, assocProp.name, result2.numTests);
 
@@ -46,15 +51,22 @@ module AlgebraicProperties {
       var gen = tupleGen(intGen(-10, 10), intGen(-10, 10));
 
       // Commutativity: a * b = b * a
-      var commProp = property("integer multiplication is commutative", gen,
-        proc(args: (int, int)) { const (a, b) = args; return intMulCommutative(a, b); });
+      var commProp = property("integer multiplication is commutative",
+        gen,
+        proc(args: (int, int)) {
+          const (a, b) = args; return intMulCommutative(a, b);
+        });
       var result1 = check(commProp);
       printResult(result1.passed, commProp.name, result1.numTests);
 
       // Associativity: (a * b) * c = a * (b * c)
-      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10), intGen(-10, 10));
-      var assocProp = property("integer multiplication is associative", gen3,
-        proc(args: (int, int, int)) { const (a, b, c) = args; return intMulAssociative(a, b, c); });
+      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10),
+                          intGen(-10, 10));
+      var assocProp = property("integer multiplication is associative",
+        gen3,
+        proc(args: (int, int, int)) {
+          const (a, b, c) = args; return intMulAssociative(a, b, c);
+        });
       var result2 = check(assocProp);
       printResult(result2.passed, assocProp.name, result2.numTests);
 
@@ -72,10 +84,14 @@ module AlgebraicProperties {
     writeln("-" * 40);
 
     {
-      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10), intGen(-10, 10));
+      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10),
+                          intGen(-10, 10));
 
-      var distProp = property("multiplication distributes over addition", gen3,
-        proc(args: (int, int, int)) { const (a, b, c) = args; return intDistributive(a, b, c); });
+      var distProp = property("multiplication distributes over addition",
+        gen3,
+        proc(args: (int, int, int)) {
+          const (a, b, c) = args; return intDistributive(a, b, c);
+        });
       var result = check(distProp);
       printResult(result.passed, distProp.name, result.numTests);
     }
@@ -90,20 +106,27 @@ module AlgebraicProperties {
 
       // max is commutative
       var maxCommProp = property("max is commutative", gen,
-        proc(args: (int, int)) { const (a, b) = args; return maxCommutative(a, b); });
+        proc(args: (int, int)) {
+          const (a, b) = args; return maxCommutative(a, b);
+        });
       var result1 = check(maxCommProp);
       printResult(result1.passed, maxCommProp.name, result1.numTests);
 
       // max is associative
-      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100), intGen(-100, 100));
+      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100),
+                          intGen(-100, 100));
       var maxAssocProp = property("max is associative", gen3,
-        proc(args: (int, int, int)) { const (a, b, c) = args; return maxAssociative(a, b, c); });
+        proc(args: (int, int, int)) {
+          const (a, b, c) = args; return maxAssociative(a, b, c);
+        });
       var result2 = check(maxAssocProp);
       printResult(result2.passed, maxAssocProp.name, result2.numTests);
 
       // min is commutative
       var minCommProp = property("min is commutative", gen,
-        proc(args: (int, int)) { const (a, b) = args; return minCommutative(a, b); });
+        proc(args: (int, int)) {
+          const (a, b) = args; return minCommutative(a, b);
+        });
       var result3 = check(minCommProp);
       printResult(result3.passed, minCommProp.name, result3.numTests);
 

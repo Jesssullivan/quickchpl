@@ -32,10 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Multi-version Chapel testing (2.6.0, 2.7.0)
 
 ### Project Structure
-- `docs/` - Comprehensive documentation
-- `examples/` - Working example programs
+- `docs/` - Comprehensive documentation (local, docs still in progress)
+- `examples/` - Working example programs (to be laced into Mason examples flow)
 - `src/` - Source modules (7 modules)
 - `tests/` - Unit and property tests
 - `scripts/` - Helper scripts for development
 
-[1.0.0]: https://github.com/Jesssullivan/chplcheck/releases/tag/v1.0.0
+[1.0.0]: https://github.com/Jesssullivan/quickchpl/releases/tag/v1.0.0

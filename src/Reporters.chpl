@@ -106,8 +106,10 @@ module Reporters {
     :arg shrunkInfo: Minimized counterexample (if different)
   */
   proc printResult(passed: bool, propertyName: string, numTests: int,
-                   failureInfo: string = "", shrunkInfo: string = "") {
-    writeln(formatResult(passed, propertyName, numTests, failureInfo, shrunkInfo));
+                   failureInfo: string = "",
+                   shrunkInfo: string = "") {
+    writeln(formatResult(passed, propertyName, numTests, failureInfo,
+                         shrunkInfo));
   }
 
   /*
@@ -118,7 +120,8 @@ module Reporters {
     :arg totalTests: Total individual tests run
     :arg duration: Total execution time (seconds)
   */
-  proc printSummary(numPassed: int, numFailed: int, totalTests: int, duration: real) {
+  proc printSummary(numPassed: int, numFailed: int, totalTests: int,
+                    duration: real) {
     writeln();
     writeln("=" * 50);
     writeln("Summary: ", numPassed, " passed, ", numFailed, " failed");
@@ -164,7 +167,7 @@ module Reporters {
     output += "1.." + results.size:string + "\n";
 
     var testNum = 1;
-    for (passed, name, numTests, failureInfo) in results {
+    for (passed, name, _, failureInfo) in results {
       if passed {
         output += "ok " + testNum:string + " - " + name + "\n";
       } else {
@@ -243,7 +246,8 @@ module Reporters {
         </testcase>
       </testsuite>
   */
-  proc formatJUnit(suiteName: string, results: list((bool, string, int, string, real))): string {
+  proc formatJUnit(suiteName: string,
+                   results: list((bool, string, int, string, real))): string {
     var numTests = results.size;
     var numFailures = 0;
     var totalTime = 0.0;
@@ -259,7 +263,7 @@ module Reporters {
     xml += "failures=\"" + numFailures:string + "\" ";
     xml += "time=\"" + totalTime:string + "\">\n";
 
-    for (passed, name, numTestsRun, failureInfo, duration) in results {
+    for (passed, name, _, failureInfo, duration) in results {
       xml += "  <testcase name=\"" + escapeXML(name) + "\" ";
       xml += "time=\"" + duration:string + "\"";
 
@@ -421,10 +425,12 @@ module Reporters {
     :arg shrunkInfo: Minimized counterexample (if different)
     :returns: Colorized formatted string
   */
-  proc formatResultColor(passed: bool, propertyName: string, numTests: int,
-                         failureInfo: string = "", shrunkInfo: string = ""): string {
+  proc formatResultColor(passed: bool, propertyName: string,
+                         numTests: int, failureInfo: string = "",
+                         shrunkInfo: string = ""): string {
     if passed {
-      return greenText("✓") + " " + propertyName + " passed " + numTests:string + " tests";
+      return greenText("✓") + " " + propertyName + " passed " +
+             numTests:string + " tests";
     } else {
       var msg = redText("✗") + " " + boldText(propertyName) + " FAILED\n";
       if failureInfo.size > 0 {

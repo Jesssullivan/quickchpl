@@ -248,14 +248,6 @@ var result = runner.check(prop);
 ```
 
 
-### Todos & Future work:
-- [x] Integrate with Chapel Mason package repo (in progress)
-- [x] Add IDE and LLM friendly text and code completions (docs in the works)
-- Provide public demo 
-- [ ] Integrate Outbot Harness 
-- [ ] Integrate with (and publish) sister projects (`chapel-k8s-mail`, `chapel-git`, `tinymachines`, `mariolex`)
-
-
 
 ## API 
 
@@ -281,5 +273,13 @@ var result = runner.check(prop);
 | `quickCheck(gen, pred)` | One-liner property check |
 | `shrink(value)` | Generate shrink candidates |
 
+
+
+### Todos & Future work:
+- [x] Integrate with Chapel Mason package repo (in progress)
+- [ ] Integrate Outbot Harness 
+- [x] Integrate with (and `[ ]` publish) sister projects, `chapel-k8s-mail`, `chapel-git`, `tinymachines`, `mariolex`)
+- [x] Add IDE and LLM friendly text and code completions (docs in the works)
+- [x] Provide public demo (`aoc-2025` **done! one is good for now**)
 
 
