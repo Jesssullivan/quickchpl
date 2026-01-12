@@ -1,34 +1,107 @@
-// quickchpl: Property Definition and Test Runner
-// Provides property definition, execution, and result handling
+/*
+  Properties Module
+  =================
 
+  Property definition, execution, and result handling for property-based testing.
+
+  This module provides the core framework for defining and running properties.
+  A property combines a generator with a predicate function, and the framework
+  automatically generates test cases to verify the property holds.
+
+  **Core Types:**
+
+  - :record:`TestResult` - Results from running a property
+  - :record:`Property` - Definition of a testable property
+  - :record:`PropertyRunner` - Configurable test executor
+
+  **Core Functions:**
+
+  - :proc:`property` - Create a property from generator and predicate
+  - :proc:`check` - Run a property and get results
+  - :proc:`forAll` - Alternative syntax for property checking
+  - :proc:`assertProperty` - Assert property holds or halt
+
+  Example::
+
+    use Properties;
+    use Generators;
+
+    // Define a property
+    var prop = property("addition is commutative",
+                        tupleGen(intGen(), intGen()),
+                        lambda((a, b): (int, int)) { return a + b == b + a; });
+
+    // Run the property
+    var result = check(prop);
+    writeln(result.passed);  // true
+*/
 module Properties {
   use Random;
   use List;
   use Time;
 
-  // Configuration (local defaults, can be overridden)
+  /*
+    Configuration Constants
+    -----------------------
+
+    Default settings for property testing. Override via command line.
+  */
+
+  /* Default number of test cases per property. */
   config const defaultNumTests = 100;
+
+  /* Default maximum shrinking iterations. */
   config const defaultMaxShrinkSteps = 1000;
+
+  /* Default timeout for shrinking (seconds). */
   config const defaultShrinkTimeout = 30.0;
+
+  /* Default verbose mode setting. */
   config const defaultVerbose = false;
+
+  /* Default parallel execution setting. */
   config const defaultParallel = false;
+
+  /* Default random seed. */
   config const defaultSeed = -1;
 
-  //============================================================================
-  // Test Result
-  //============================================================================
+  /*
+    Test Result
+    -----------
 
+    Comprehensive result from running a property test.
+  */
+
+  /*
+    Result of property testing.
+
+    Contains all information about a property test run, including
+    pass/fail status, test counts, timing, and counterexample info.
+
+    :var passed: Whether all tests passed
+    :var numTests: Total number of tests run
+    :var numPassed: Number of passing tests
+    :var numFailed: Number of failing tests
+    :var propertyName: Name of the tested property
+    :var failureInfo: String representation of first counterexample
+    :var shrunkInfo: String representation of minimized counterexample
+    :var shrinkSteps: Number of shrinking iterations performed
+    :var duration: Execution time in seconds
+  */
   record TestResult {
     var passed: bool;
     var numTests: int;
     var numPassed: int;
     var numFailed: int;
     var propertyName: string;
-    var failureInfo: string;  // String representation of counterexample
-    var shrunkInfo: string;   // String representation of shrunk counterexample
+    var failureInfo: string;
+    var shrunkInfo: string;
     var shrinkSteps: int;
-    var duration: real;       // Execution time in seconds
+    var duration: real;
 
+    /*
+      Create an empty test result (default: passing).
+    */
     proc init() {
       this.passed = true;
       this.numTests = 0;
@@ -41,6 +114,19 @@ module Properties {
       this.duration = 0.0;
     }
 
+    /*
+      Create a test result with all fields specified.
+
+      :arg passed: Whether all tests passed
+      :arg numTests: Total tests run
+      :arg numPassed: Passing test count
+      :arg numFailed: Failing test count
+      :arg propertyName: Name of property
+      :arg failureInfo: First counterexample (if any)
+      :arg shrunkInfo: Minimized counterexample (if any)
+      :arg shrinkSteps: Shrinking iterations
+      :arg duration: Execution time
+    */
     proc init(passed: bool, numTests: int, numPassed: int, numFailed: int,
               propertyName: string, failureInfo: string = "",
               shrunkInfo: string = "", shrinkSteps: int = 0, duration: real = 0.0) {
@@ -56,16 +142,37 @@ module Properties {
     }
   }
 
-  //============================================================================
-  // Property Record
-  //============================================================================
+  /*
+    Property Record
+    ---------------
 
+    Definition of a testable property.
+  */
+
+  /*
+    A property to be tested.
+
+    Combines a name, generator, and predicate function.
+    The predicate should return true for all valid inputs.
+
+    :type GenType: Type of the generator
+    :var name: Human-readable property name
+    :var generator: Generator for test values
+    :var predicateFn: Function returning bool for each test case
+  */
   record Property {
     type GenType;
     var name: string;
     var generator: GenType;
     var predicateFn;
 
+    /*
+      Create a property.
+
+      :arg name: Human-readable name for the property
+      :arg generator: Generator for test values
+      :arg predicateFn: Predicate function to test
+    */
     proc init(name: string, generator, predicateFn) {
       this.GenType = generator.type;
       this.name = name;
@@ -74,15 +181,44 @@ module Properties {
     }
   }
 
-  // Factory function for creating properties
+  /*
+    Create a property from a generator and predicate.
+
+    :arg name: Human-readable property name
+    :arg gen: Generator for test values
+    :arg pred: Predicate function returning bool
+    :returns: New Property ready for testing
+
+    Example::
+
+      var prop = property("x + 0 = x",
+                          intGen(),
+                          lambda(x: int) { return x + 0 == x; });
+  */
   proc property(name: string, gen, pred) {
     return new Property(name, gen, pred);
   }
 
-  //============================================================================
-  // Property Runner
-  //============================================================================
+  /*
+    Property Runner
+    ---------------
 
+    Configurable test executor with shrinking support.
+  */
+
+  /*
+    Configurable property test runner.
+
+    Executes property tests with customizable settings for
+    test count, shrinking, verbosity, and parallelism.
+
+    :var numTests: Number of test cases to generate
+    :var maxShrinkSteps: Maximum shrinking iterations
+    :var shrinkTimeout: Timeout for shrinking (seconds)
+    :var verboseMode: Show each test case
+    :var parallelMode: Run tests in parallel
+    :var rngSeed: Random seed for reproducibility
+  */
   record PropertyRunner {
     var numTests: int;
     var maxShrinkSteps: int;
@@ -91,6 +227,16 @@ module Properties {
     var parallelMode: bool;
     var rngSeed: int;
 
+    /*
+      Create a property runner with custom settings.
+
+      :arg numTests: Test cases to generate (default: 100)
+      :arg maxShrinkSteps: Max shrink iterations (default: 1000)
+      :arg shrinkTimeout: Shrink timeout seconds (default: 30.0)
+      :arg verboseMode: Show each test (default: false)
+      :arg parallelMode: Parallel execution (default: false)
+      :arg rngSeed: Random seed (default: -1 for random)
+    */
     proc init(numTests: int = defaultNumTests,
               maxShrinkSteps: int = defaultMaxShrinkSteps,
               shrinkTimeout: real = defaultShrinkTimeout,
@@ -105,6 +251,15 @@ module Properties {
       this.rngSeed = rngSeed;
     }
 
+    /*
+      Run a property test.
+
+      Generates test cases, runs the predicate, and reports results.
+      Stops on first failure unless verboseMode is true.
+
+      :arg prop: Property to test
+      :returns: TestResult with pass/fail status and details
+    */
     proc ref check(ref prop: Property): TestResult {
       const startTime = timeSinceEpoch().totalSeconds();
 
@@ -168,42 +323,94 @@ module Properties {
     }
   }
 
-  // Global check function using default configuration
+  /*
+    Run a property with default configuration.
+
+    :arg prop: Property to test
+    :returns: TestResult with pass/fail status
+
+    Example::
+
+      var result = check(prop);
+      if !result.passed {
+        writeln("Failed: ", result.failureInfo);
+      }
+  */
   proc check(ref prop: Property): TestResult {
     var runner = new PropertyRunner();
     return runner.check(prop);
   }
 
-  // Check with custom number of tests
+  /*
+    Run a property with custom test count.
+
+    :arg prop: Property to test
+    :arg n: Number of test cases
+    :returns: TestResult with pass/fail status
+  */
   proc check(ref prop: Property, n: int): TestResult {
     var runner = new PropertyRunner(numTests = n);
     return runner.check(prop);
   }
 
-  //============================================================================
-  // Implication Function (for conditional properties)
-  //============================================================================
-  // Note: implies() is defined in Patterns module
-  //============================================================================
-  // forAll - alternative property syntax
-  //============================================================================
+  /*
+    forAll - Alternative Property Syntax
+    ------------------------------------
 
-  // forAll(gen, pred) is equivalent to check(property("anonymous", gen, pred))
+    More concise syntax for property checking.
+  */
+
+  /*
+    Check a property using forAll syntax.
+
+    Equivalent to ``check(property("forAll", gen, pred))``.
+
+    :arg gen: Generator for test values
+    :arg pred: Predicate function
+    :returns: TestResult
+
+    Example::
+
+      var result = forAll(intGen(), lambda(x: int) { return x == x; });
+  */
   proc forAll(gen, pred): TestResult {
     var prop = property("forAll", gen, pred);
     return check(prop);
   }
 
+  /*
+    Check a property with custom test count.
+
+    :arg gen: Generator for test values
+    :arg pred: Predicate function
+    :arg n: Number of test cases
+    :returns: TestResult
+  */
   proc forAll(gen, pred, n: int): TestResult {
     var prop = property("forAll", gen, pred);
     return check(prop, n);
   }
 
-  //============================================================================
-  // Assertion Helpers
-  //============================================================================
+  /*
+    Assertion Helpers
+    -----------------
 
-  // Assert that a property holds
+    Halt execution if property fails.
+  */
+
+  /*
+    Assert that a property holds.
+
+    Halts with error message if property fails.
+
+    :arg prop: Property to test
+    :throws: Halts if property fails
+
+    Example::
+
+      // Test will halt if property fails
+      assertProperty(prop);
+  */
   proc assertProperty(ref prop: Property) {
     const result = check(prop);
     if !result.passed {
@@ -213,7 +420,13 @@ module Properties {
     }
   }
 
-  // Assert that a property holds with custom test count
+  /*
+    Assert with custom test count.
+
+    :arg prop: Property to test
+    :arg n: Number of test cases
+    :throws: Halts if property fails
+  */
   proc assertProperty(ref prop: Property, n: int) {
     const result = check(prop, n);
     if !result.passed {
@@ -223,11 +436,25 @@ module Properties {
     }
   }
 
-  //============================================================================
-  // Property Combinators
-  //============================================================================
+  /*
+    Property Combinators
+    --------------------
 
-  // Combine two properties with AND
+    Combine multiple properties for complex testing.
+  */
+
+  /*
+    Combined AND property.
+
+    Represents the conjunction of two properties.
+    Both must pass for the combined property to pass.
+
+    :type Prop1Type: Type of first property
+    :type Prop2Type: Type of second property
+    :var prop1: First property
+    :var prop2: Second property
+    :var name: Combined name "prop1 AND prop2"
+  */
   record AndProperty {
     type Prop1Type;
     type Prop2Type;
@@ -235,6 +462,12 @@ module Properties {
     var prop2: Prop2Type;
     var name: string;
 
+    /*
+      Create an AND combination of two properties.
+
+      :arg prop1: First property
+      :arg prop2: Second property
+    */
     proc init(prop1, prop2) {
       this.Prop1Type = prop1.type;
       this.Prop2Type = prop2.type;
@@ -244,7 +477,19 @@ module Properties {
     }
   }
 
-  // Run multiple properties and collect results
+  /*
+    Run multiple properties and collect all results.
+
+    :arg props: Iterable of properties to test
+    :returns: List of TestResult for each property
+
+    Example::
+
+      var results = checkAll([prop1, prop2, prop3]);
+      for result in results {
+        writeln(result.propertyName, ": ", result.passed);
+      }
+  */
   proc checkAll(props): list(TestResult) {
     var results: list(TestResult);
     for prop in props {
@@ -253,7 +498,19 @@ module Properties {
     return results;
   }
 
-  // Check if all results passed
+  /*
+    Check if all results passed.
+
+    :arg results: List of test results
+    :returns: true if all results passed, false otherwise
+
+    Example::
+
+      var results = checkAll(props);
+      if allPassed(results) {
+        writeln("All properties verified!");
+      }
+  */
   proc allPassed(results: list(TestResult)): bool {
     for result in results {
       if !result.passed then return false;

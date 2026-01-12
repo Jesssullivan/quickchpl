@@ -1,19 +1,65 @@
-// quickchpl: Shrinking Engine
-// Provides type-specific shrinking for minimal counterexamples
+/*
+  Shrinkers Module
+  ================
 
+  Type-specific shrinking for minimal counterexamples.
+
+  When a property test fails, shrinking attempts to find the smallest
+  input that still causes the failure. This makes debugging much easier
+  by reducing complex failing inputs to simple, minimal cases.
+
+  **Shrinking Strategies:**
+
+  - Integers: Binary search towards 0
+  - Reals: Truncate, round, binary search towards 0
+  - Booleans: true shrinks to false
+  - Strings: Remove characters, simplify to 'a'
+  - Lists: Remove elements, shrink individual elements
+  - Tuples: Shrink each component
+
+  **Core Functions:**
+
+  - :proc:`shrink` - Generic dispatcher for type-specific shrinking
+  - :proc:`shrinkInt` - Generate shrink candidates for integers
+  - :proc:`shrinkReal` - Generate shrink candidates for reals
+  - :proc:`shrinkString` - Generate shrink candidates for strings
+  - :proc:`shrinkIntList` - Generate shrink candidates for int lists
+
+  Example::
+
+    use Shrinkers;
+
+    // Shrink a failing integer
+    var candidates = shrinkInt(42);
+    // candidates = [0, 21, 10, 5, 2, 1, 41]
+*/
 module Shrinkers {
   use List;
 
-  //============================================================================
-  // Shrink Result
-  //============================================================================
+  /*
+    Shrink Result
+    -------------
 
+    Result of a shrinking operation.
+  */
+
+  /*
+    Result of shrinking a counterexample.
+
+    :var original: Original failing value (as string)
+    :var shrunk: Minimized failing value (as string)
+    :var steps: Number of shrinking iterations
+    :var duration: Time spent shrinking (seconds)
+  */
   record ShrinkResult {
     var original: string;
     var shrunk: string;
     var steps: int;
     var duration: real;
 
+    /*
+      Create an empty shrink result.
+    */
     proc init() {
       this.original = "";
       this.shrunk = "";
@@ -21,6 +67,14 @@ module Shrinkers {
       this.duration = 0.0;
     }
 
+    /*
+      Create a shrink result with values.
+
+      :arg original: Original failing value
+      :arg shrunk: Minimized failing value
+      :arg steps: Shrinking iterations performed
+      :arg duration: Time spent shrinking
+    */
     proc init(original: string, shrunk: string, steps: int, duration: real) {
       this.original = original;
       this.shrunk = shrunk;
@@ -29,12 +83,27 @@ module Shrinkers {
     }
   }
 
-  //============================================================================
-  // Integer Shrinking
-  //============================================================================
+  /*
+    Integer Shrinking
+    -----------------
 
-  // Generate shrink candidates for an integer
-  // Strategy: binary search towards 0
+    Strategy: Binary search towards 0 (the simplest integer).
+  */
+
+  /*
+    Generate shrink candidates for an integer.
+
+    Strategy: Try 0 first, then binary search towards 0,
+    then try immediate neighbors.
+
+    :arg value: Integer to shrink
+    :returns: List of candidate smaller values
+
+    Example::
+
+      var candidates = shrinkInt(100);
+      // [0, 50, 25, 12, 6, 3, 1, 99]
+  */
   proc shrinkInt(value: int): list(int) {
     var candidates: list(int);
 
@@ -66,7 +135,21 @@ module Shrinkers {
     return candidates;
   }
 
-  // Shrink an integer failure
+  /*
+    Shrink an integer failure to find minimal counterexample.
+
+    Repeatedly shrinks the value while the property still fails.
+
+    :arg value: Initial failing value
+    :arg pred: Predicate that should return true for valid values
+    :arg maxSteps: Maximum shrinking iterations
+    :returns: Tuple of (minimized value, steps taken)
+
+    Example::
+
+      var (minimal, steps) = shrinkIntFailure(1000, lambda(x: int) { return x < 50; });
+      // minimal = 50, the smallest value where pred returns false
+  */
   proc shrinkIntFailure(value: int, pred, maxSteps: int = 1000): (int, int) {
     var current = value;
     var steps = 0;
@@ -91,11 +174,27 @@ module Shrinkers {
     return (current, steps);
   }
 
-  //============================================================================
-  // Real Shrinking
-  //============================================================================
+  /*
+    Real Number Shrinking
+    ---------------------
 
-  // Generate shrink candidates for a real number
+    Strategy: Try 0, truncate to integer, round, then binary search.
+  */
+
+  /*
+    Generate shrink candidates for a real number.
+
+    Strategy: Try 0, truncate to integer, round to nearest integer,
+    then binary search towards 0.
+
+    :arg value: Real number to shrink
+    :returns: List of candidate smaller values
+
+    Example::
+
+      var candidates = shrinkReal(3.14159);
+      // [0.0, 3.0, 1.57, 0.785, ...]
+  */
   proc shrinkReal(value: real): list(real) {
     var candidates: list(real);
 
@@ -128,12 +227,21 @@ module Shrinkers {
     return candidates;
   }
 
-  //============================================================================
-  // Boolean Shrinking
-  //============================================================================
+  /*
+    Boolean Shrinking
+    -----------------
 
-  // Generate shrink candidates for a boolean
-  // Strategy: false is simpler than true
+    Strategy: false is simpler than true.
+  */
+
+  /*
+    Generate shrink candidates for a boolean.
+
+    Strategy: true shrinks to false, false has no shrinks.
+
+    :arg value: Boolean to shrink
+    :returns: List containing [false] if value is true, empty otherwise
+  */
   proc shrinkBool(value: bool): list(bool) {
     var candidates: list(bool);
 
@@ -144,12 +252,30 @@ module Shrinkers {
     return candidates;
   }
 
-  //============================================================================
-  // String Shrinking
-  //============================================================================
+  /*
+    String Shrinking
+    ----------------
 
-  // Generate shrink candidates for a string
-  // Strategy: try empty, remove chars, simplify chars
+    Strategy: Try empty, remove characters, simplify characters to 'a'.
+  */
+
+  /*
+    Generate shrink candidates for a string.
+
+    Strategy:
+    1. Try empty string
+    2. Remove characters from the end
+    3. Remove single characters
+    4. Simplify characters to 'a'
+
+    :arg value: String to shrink
+    :returns: List of candidate smaller strings
+
+    Example::
+
+      var candidates = shrinkString("hello");
+      // ["", "h", "he", "hel", "hell", "ello", "hllo", "helo", "aello", ...]
+  */
   proc shrinkString(value: string): list(string) {
     var candidates: list(string);
 
@@ -190,11 +316,34 @@ module Shrinkers {
     return candidates;
   }
 
-  //============================================================================
-  // List Shrinking
-  //============================================================================
+  /*
+    List Shrinking
+    --------------
 
-  // Generate shrink candidates for a list of integers
+    Strategy: Try empty, remove elements, shrink individual elements.
+  */
+
+  /*
+    Generate shrink candidates for a list of integers.
+
+    Strategy:
+    1. Try empty list
+    2. Remove elements from the end
+    3. Remove single elements
+    4. Shrink individual elements
+
+    :arg value: List to shrink
+    :returns: List of candidate smaller lists
+
+    Example::
+
+      var myList: list(int);
+      myList.pushBack(10);
+      myList.pushBack(20);
+
+      var candidates = shrinkIntList(myList);
+      // [[], [10], [20], [0, 20], [5, 20], [10, 0], [10, 10], ...]
+  */
   proc shrinkIntList(value: list(int)): list(list(int)) {
     var candidates: list(list(int));
 
@@ -238,11 +387,26 @@ module Shrinkers {
     return candidates;
   }
 
-  //============================================================================
-  // Tuple Shrinking
-  //============================================================================
+  /*
+    Tuple Shrinking
+    ---------------
 
-  // Shrink a 2-tuple of integers
+    Shrink tuples by shrinking each component.
+  */
+
+  /*
+    Generate shrink candidates for a 2-tuple of integers.
+
+    Shrinks each component independently and in combination.
+
+    :arg value: 2-tuple to shrink
+    :returns: List of candidate smaller tuples
+
+    Example::
+
+      var candidates = shrinkIntTuple2((10, 20));
+      // [(0, 20), (5, 20), (10, 0), (10, 10), (0, 0), (5, 10), ...]
+  */
   proc shrinkIntTuple2(value: (int, int)): list((int, int)) {
     var candidates: list((int, int));
 
@@ -268,7 +432,14 @@ module Shrinkers {
     return candidates;
   }
 
-  // Shrink a 3-tuple of integers
+  /*
+    Generate shrink candidates for a 3-tuple of integers.
+
+    Shrinks each component independently.
+
+    :arg value: 3-tuple to shrink
+    :returns: List of candidate smaller tuples
+  */
   proc shrinkIntTuple3(value: (int, int, int)): list((int, int, int)) {
     var candidates: list((int, int, int));
 
@@ -288,41 +459,79 @@ module Shrinkers {
     return candidates;
   }
 
-  //============================================================================
-  // Generic Shrink Dispatcher
-  //============================================================================
+  /*
+    Generic Shrink Dispatcher
+    -------------------------
 
-  // Shrink an integer
+    Type-dispatched shrinking for common types.
+  */
+
+  /*
+    Shrink an integer (dispatches to shrinkInt).
+
+    :arg value: Integer to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: int): list(int) {
     return shrinkInt(value);
   }
 
-  // Shrink a real
+  /*
+    Shrink a real number (dispatches to shrinkReal).
+
+    :arg value: Real to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: real): list(real) {
     return shrinkReal(value);
   }
 
-  // Shrink a bool
+  /*
+    Shrink a boolean (dispatches to shrinkBool).
+
+    :arg value: Boolean to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: bool): list(bool) {
     return shrinkBool(value);
   }
 
-  // Shrink a string
+  /*
+    Shrink a string (dispatches to shrinkString).
+
+    :arg value: String to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: string): list(string) {
     return shrinkString(value);
   }
 
-  // Shrink a list of ints
+  /*
+    Shrink a list of integers (dispatches to shrinkIntList).
+
+    :arg value: List to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: list(int)): list(list(int)) {
     return shrinkIntList(value);
   }
 
-  // Shrink a 2-tuple of ints
+  /*
+    Shrink a 2-tuple of integers (dispatches to shrinkIntTuple2).
+
+    :arg value: Tuple to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: (int, int)): list((int, int)) {
     return shrinkIntTuple2(value);
   }
 
-  // Shrink a 3-tuple of ints
+  /*
+    Shrink a 3-tuple of integers (dispatches to shrinkIntTuple3).
+
+    :arg value: Tuple to shrink
+    :returns: List of shrink candidates
+  */
   proc shrink(value: (int, int, int)): list((int, int, int)) {
     return shrinkIntTuple3(value);
   }

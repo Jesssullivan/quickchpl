@@ -249,9 +249,11 @@ var result = runner.check(prop);
 
 
 ### Todos & Future work:
-- [ ] Integrate with Chapel Mason package repo
+- [ ] Integrate with Chapel Mason package repo (in progress)
+- [ ] Add IDE and LLM friendly text and code completions (in progress)
 - [ ] Integrate Outbot Harness 
-- [ ] Add IDE and LLM friendly text and code completions 
+- [ ] Integrate with (and publish) sister projects (`chapel-k8s-mail`, `chapel-git`, `tinymachines`, `mariolex`)
+
 
 
 ## API 

@@ -1,0 +1,243 @@
+name: Chapel CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  QUICKCHPL_NUM_TESTS: "100"
+  QUICKCHPL_VERBOSE: "false"
+
+jobs:
+  build:
+    name: Build quickchpl
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify Chapel installation
+        run: |
+          chpl --version
+          mason --version || echo "Mason not found, using chpl directly"
+
+      - name: Build package
+        run: |
+          cd src
+          chpl --library chapelcheck.chpl Generators.chpl Combinators.chpl Properties.chpl Shrinkers.chpl Reporters.chpl Patterns.chpl
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: src/*.a
+          retention-days: 1
+
+  test-unit:
+    name: Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Generator Tests
+        run: |
+          echo "Running Generator Tests..."
+          chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+          /tmp/generator_tests
+
+      - name: Run Shrinker Tests
+        run: |
+          echo "Running Shrinker Tests..."
+          chpl tests/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+          /tmp/shrinker_tests
+
+      - name: Run Property Tests
+        run: |
+          echo "Running Property Tests..."
+          chpl tests/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+          /tmp/property_tests
+
+  test-examples:
+    name: Example Programs
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Getting Started Example
+        run: |
+          echo "Running Getting Started Example..."
+          chpl examples/GettingStarted.chpl src/*.chpl -o /tmp/getting_started
+          /tmp/getting_started
+
+      - name: Run Algebraic Properties Example
+        run: |
+          echo "Running Algebraic Properties Example..."
+          chpl examples/AlgebraicProperties.chpl src/*.chpl -o /tmp/algebraic
+          /tmp/algebraic
+
+      - name: Run Custom Generators Example
+        run: |
+          echo "Running Custom Generators Example..."
+          chpl examples/CustomGenerators.chpl src/*.chpl -o /tmp/custom_gen
+          /tmp/custom_gen
+
+  test-self:
+    name: Property-Based Self Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run quickchpl self-tests
+        run: |
+          chpl tests/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
+          /tmp/self_tests --numTests=${{ env.QUICKCHPL_NUM_TESTS }}
+
+  test-matrix:
+    name: Test on Chapel ${{ matrix.chapel-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chapel-version: ['2.6.0', '2.7.0']
+
+    container:
+      image: chapel/chapel:${{ matrix.chapel-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with Chapel ${{ matrix.chapel-version }}
+        run: |
+          chpl --version
+          chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
+          /tmp/test
+
+  integration-test:
+    name: Integration Test (aoc-2025-chapel-27)
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - name: Checkout quickchpl
+        uses: actions/checkout@v4
+        with:
+          path: quickchpl
+
+      - name: Checkout aoc-2025-chapel-27
+        uses: actions/checkout@v4
+        with:
+          repository: Jesssullivan2/aoc-2025-chapel-27
+          path: aoc-2025-chapel-27
+
+      - name: Setup local Mason registry
+        run: |
+          # Create local registry structure
+          mkdir -p ~/.mason/registry/local/Bricks/quickchpl
+
+          # Create brick metadata for quickchpl 1.0.0
+          cat > ~/.mason/registry/local/Bricks/quickchpl/1.0.0.toml << 'EOF'
+          [brick]
+          name = "quickchpl"
+          version = "1.0.0"
+          chplVersion = "2.6.0..2.7.0"
+          license = "MIT"
+
+          [source]
+          type = "path"
+          path = "${{ github.workspace }}/quickchpl"
+          EOF
+
+          # Configure Mason to use local registry first
+          mkdir -p ~/.mason
+          cat > ~/.mason/Mason.toml << 'EOF'
+          [registries]
+          local = { path = "~/.mason/registry/local" }
+          EOF
+
+          echo "Local registry configured"
+
+      - name: Build aoc-2025-chapel-27 with local quickchpl
+        working-directory: aoc-2025-chapel-27
+        run: |
+          # Use quickchpl source directly
+          export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:${{ github.workspace }}/quickchpl/src
+
+          # Compile a test solution that uses quickchpl
+          if [ -f "src/day01.chpl" ]; then
+            echo "Building day01 with quickchpl..."
+            chpl src/day01.chpl -o /tmp/day01 --module-dir ${{ github.workspace }}/quickchpl/src
+            /tmp/day01 --numTests=10 || true
+          else
+            echo "No day01.chpl found, running basic integration check..."
+            chpl -M ${{ github.workspace }}/quickchpl/src -e "use quickchpl; writeln('Integration OK: quickchpl version ', VERSION);"
+          fi
+
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for trailing whitespace
+        run: |
+          echo "Checking for trailing whitespace..."
+          ! grep -rn '[[:space:]]$' src/*.chpl tests/*.chpl examples/*.chpl || {
+            echo "Found trailing whitespace"
+            exit 1
+          }
+
+      - name: Check file permissions
+        run: |
+          echo "Checking execute permissions on source files..."
+          find src tests examples -name "*.chpl" -perm +111 && {
+            echo "Found executable .chpl files (should not be executable)"
+            exit 1
+          } || echo "✓ No executable .chpl files found"
+
+  generate-docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate documentation with chpldoc
+        run: |
+          cd src
+          for file in *.chpl; do
+            echo "Generating docs for $file..."
+            chpldoc "$file" --output-dir ../docs/api || echo "Warning: chpldoc failed for $file"
+          done
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs
+          path: docs/api/
+          retention-days: 7
