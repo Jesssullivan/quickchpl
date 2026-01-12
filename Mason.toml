@@ -1,0 +1,15 @@
+[brick]
+name = "quickchpl"
+version = "1.0.0"
+chplVersion = "2.6.0..2.7.0"
+license = "MIT"
+authors = ["Jess Sullivan <jess@sulliwood.org>"]
+repository = "https://gitlab.com/tinyland/projects/quickchpl"
+description = "A simple property-based testing library for Chapel"
+keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
+
+[dependencies]
+# No external dependencies - pure Chapel uWu
+
+[dev-dependencies]
+# chplcheck needed

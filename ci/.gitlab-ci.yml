@@ -1,0 +1,112 @@
+variables:
+  CHAPEL_VERSION: "2.6.0"
+  quickchpl_NUM_TESTS: "100"
+  quickchpl_MAX_SHRINK_STEPS: "1000"
+  quickchpl_VERBOSE: "false"
+  quickchpl_PARALLEL: "false"
+
+stages:
+  - build
+  - test
+  - report
+
+.chapel_setup:
+  image: chapel/chapel:${CHAPEL_VERSION}
+  before_script:
+    - chpl --version
+    - echo "Chapel setup complete"
+
+build:
+  extends: .chapel_setup
+  stage: build
+  script:
+    - cd src
+    - chpl --library --library-makefile quickchpl.chpl Generators.chpl Combinators.chpl Properties.chpl Shrinkers.chpl Reporters.chpl Patterns.chpl
+  artifacts:
+    paths:
+      - src/*.a
+      - src/*.so
+    expire_in: 1 hour
+
+unit_tests:
+  extends: .chapel_setup
+  stage: test
+  script:
+    - echo "Running Generator Tests..."
+    - chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+    - /tmp/generator_tests
+
+    - echo "Running Shrinker Tests..."
+    - chpl tests/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+    - /tmp/shrinker_tests
+
+    - echo "Running Property Tests..."
+    - chpl tests/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+    - /tmp/property_tests
+  artifacts:
+    when: always
+    reports:
+      junit: test-results.xml
+
+# Run examples to verify they work
+examples:
+  extends: .chapel_setup
+  stage: test
+  script:
+    - echo "Running Getting Started Example..."
+    - chpl examples/GettingStarted.chpl src/*.chpl -o /tmp/getting_started
+    - /tmp/getting_started
+
+    - echo "Running Algebraic Properties Example..."
+    - chpl examples/AlgebraicProperties.chpl src/*.chpl -o /tmp/algebraic
+    - /tmp/algebraic
+
+    - echo "Running Custom Generators Example..."
+    - chpl examples/CustomGenerators.chpl src/*.chpl -o /tmp/custom_gen
+    - /tmp/custom_gen
+  allow_failure: true
+
+self_test:
+  extends: .chapel_setup
+  stage: test
+  script:
+    - echo "Running quickchpl self-tests..."
+    - chpl tests/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests --numTests=${quickchpl_NUM_TESTS}
+    - /tmp/self_tests
+  artifacts:
+    when: always
+    paths:
+      - test-results.xml
+
+benchmarks:
+  extends: .chapel_setup
+  stage: report
+  script:
+    - echo "Running performance benchmarks..."
+    - chpl --fast benchmarks/*.chpl src/*.chpl -o /tmp/benchmarks
+    - /tmp/benchmarks
+  when: manual
+  artifacts:
+    paths:
+      - benchmark-results.txt
+
+docs:
+  extends: .chapel_setup
+  stage: report
+  script:
+    - chpldoc src/*.chpl --output-dir=docs/api
+  artifacts:
+    paths:
+      - docs/api/
+  when: manual
+
+
+.property_test_template:
+  extends: .chapel_setup
+  stage: test
+  variables:
+    quickchpl_NUM_TESTS: "100"
+  artifacts:
+    when: always
+    reports:
+      junit: test-results.xml
