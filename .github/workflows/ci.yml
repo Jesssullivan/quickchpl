@@ -47,19 +47,19 @@ jobs:
       - name: Run Generator Tests
         run: |
           echo "Running Generator Tests..."
-          chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+          chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
           /tmp/generator_tests
 
       - name: Run Shrinker Tests
         run: |
           echo "Running Shrinker Tests..."
-          chpl tests/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+          chpl test/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
           /tmp/shrinker_tests
 
       - name: Run Property Tests
         run: |
           echo "Running Property Tests..."
-          chpl tests/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+          chpl test/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
           /tmp/property_tests
 
   test-examples:
@@ -104,7 +104,7 @@ jobs:
 
       - name: Run quickchpl self-tests
         run: |
-          chpl tests/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
+          chpl test/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
           /tmp/self_tests --numTests=${{ env.QUICKCHPL_NUM_TESTS }}
 
   test-matrix:
@@ -124,7 +124,7 @@ jobs:
       - name: Build with Chapel ${{ matrix.chapel-version }}
         run: |
           chpl --version
-          chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
+          chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
           /tmp/test
 
   lint:

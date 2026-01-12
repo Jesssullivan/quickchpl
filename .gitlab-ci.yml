@@ -97,21 +97,21 @@ test:unit:generators:
   stage: test
   script:
     - echo "Running Generator Tests..."
-    - chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+    - chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
     - /tmp/generator_tests
 
 test:unit:shrinkers:
   stage: test
   script:
     - echo "Running Shrinker Tests..."
-    - chpl tests/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+    - chpl test/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
     - /tmp/shrinker_tests
 
 test:unit:properties:
   stage: test
   script:
     - echo "Running Property Tests..."
-    - chpl tests/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+    - chpl test/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
     - /tmp/property_tests
 
 test:examples:
@@ -131,7 +131,7 @@ test:self:
   stage: test
   script:
     - echo "Running quickchpl self-tests..."
-    - chpl tests/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
+    - chpl test/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
     - /tmp/self_tests --numTests=$QUICKCHPL_NUM_TESTS
 
 # Matrix testing for Chapel versions
@@ -139,7 +139,7 @@ test:self:
   stage: test
   script:
     - chpl --version
-    - chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
+    - chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
     - /tmp/test
 
 test:chapel-2.6.0:
