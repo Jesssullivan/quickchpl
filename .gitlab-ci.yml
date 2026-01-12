@@ -28,7 +28,7 @@ build:
   script:
     - chpl --version
     # Verify all modules compile together
-    - chpl -M src --no-codegen src/chapelcheck.chpl
+    - chpl -M src --no-codegen src/quickchpl.chpl
     - echo "✓ All modules compile successfully"
 
 # ============================================

@@ -117,7 +117,8 @@ module quickchpl {
       assert(quickCheck(intGen(), lambda(x: int) { return x + 0 == x; }));
   */
   proc quickCheck(gen, prop): bool {
-    const result = check(property("quickCheck", gen, prop));
+    var p = property("quickCheck", gen, prop);
+    const result = check(p);
     return result.passed;
   }
 
@@ -136,7 +137,8 @@ module quickchpl {
   */
   proc quickCheck(gen, prop, n: int): bool {
     var runner = new PropertyRunner(numTests = n);
-    const result = runner.check(property("quickCheck", gen, prop));
+    var p = property("quickCheck", gen, prop);
+    const result = runner.check(p);
     return result.passed;
   }
 }
