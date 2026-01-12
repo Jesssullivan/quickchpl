@@ -9,17 +9,6 @@
 Inspired by QuickCheck and my father ^w^
 
 
-
-
-
-### Installation
-
-Using Mason (recommended):
-```bash
-mason add quickchpl
-mason update
-```
-
 Manual installation:
 ```bash
 # clone
@@ -258,6 +247,13 @@ var runner = new PropertyRunner(
 var result = runner.check(prop);
 ```
 
+
+### Todos & Future work:
+- [ ] Integrate with Chapel Mason package repo
+- [ ] Integrate Outbot Harness 
+- [ ] Add IDE and LLM friendly text and code completions 
+
+
 ## API 
 
 ### Core Types
@@ -284,7 +280,3 @@ var result = runner.check(prop);
 
 
 
-### Todos & Future work:
-- [ ] Integrate with Chapel Mason package repo
-- [ ] Integrate Outbot Harness 
-- [ ] Add IDE and LLM friendly text and code completions 
