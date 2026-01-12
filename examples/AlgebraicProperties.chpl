@@ -1,5 +1,5 @@
 // quickchpl: Algebraic Properties Example
-// Demonstrates testing algebraic laws using the Patterns library
+// Demonstrates testing algebraic laws using the Patterns predicates
 
 module AlgebraicProperties {
   use quickchpl;
@@ -14,23 +14,25 @@ module AlgebraicProperties {
     writeln("-" * 40);
 
     {
-      var gen = intGen(-100, 100);
+      var gen = tupleGen(intGen(-100, 100), intGen(-100, 100));
 
       // Commutativity: a + b = b + a
-      var commProp = commutativeProperty("integer addition", gen,
-        proc(a: int, b: int) { return a + b; });
+      var commProp = property("integer addition is commutative", gen,
+        proc(args: (int, int)) { const (a, b) = args; return intAddCommutative(a, b); });
       var result1 = check(commProp);
       printResult(result1.passed, commProp.name, result1.numTests);
 
       // Associativity: (a + b) + c = a + (b + c)
-      var assocProp = associativeProperty("integer addition", gen,
-        proc(a: int, b: int) { return a + b; });
+      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100), intGen(-100, 100));
+      var assocProp = property("integer addition is associative", gen3,
+        proc(args: (int, int, int)) { const (a, b, c) = args; return intAddAssociative(a, b, c); });
       var result2 = check(assocProp);
       printResult(result2.passed, assocProp.name, result2.numTests);
 
       // Identity: a + 0 = a
-      var idProp = identityProperty("integer addition", gen,
-        proc(a: int, b: int) { return a + b; }, 0);
+      var gen1 = intGen(-100, 100);
+      var idProp = property("zero is additive identity", gen1,
+        proc(a: int) { return intAddIdentity(a); });
       var result3 = check(idProp);
       printResult(result3.passed, idProp.name, result3.numTests);
     }
@@ -41,23 +43,25 @@ module AlgebraicProperties {
     writeln("-" * 40);
 
     {
-      var gen = intGen(-10, 10);  // Smaller range to avoid overflow
+      var gen = tupleGen(intGen(-10, 10), intGen(-10, 10));
 
       // Commutativity: a * b = b * a
-      var commProp = commutativeProperty("integer multiplication", gen,
-        proc(a: int, b: int) { return a * b; });
+      var commProp = property("integer multiplication is commutative", gen,
+        proc(args: (int, int)) { const (a, b) = args; return intMulCommutative(a, b); });
       var result1 = check(commProp);
       printResult(result1.passed, commProp.name, result1.numTests);
 
       // Associativity: (a * b) * c = a * (b * c)
-      var assocProp = associativeProperty("integer multiplication", gen,
-        proc(a: int, b: int) { return a * b; });
+      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10), intGen(-10, 10));
+      var assocProp = property("integer multiplication is associative", gen3,
+        proc(args: (int, int, int)) { const (a, b, c) = args; return intMulAssociative(a, b, c); });
       var result2 = check(assocProp);
       printResult(result2.passed, assocProp.name, result2.numTests);
 
       // Identity: a * 1 = a
-      var idProp = identityProperty("integer multiplication", gen,
-        proc(a: int, b: int) { return a * b; }, 1);
+      var gen1 = intGen(-10, 10);
+      var idProp = property("one is multiplicative identity", gen1,
+        proc(a: int) { return intMulIdentity(a); });
       var result3 = check(idProp);
       printResult(result3.passed, idProp.name, result3.numTests);
     }
@@ -68,11 +72,10 @@ module AlgebraicProperties {
     writeln("-" * 40);
 
     {
-      var gen = intGen(-10, 10);
+      var gen3 = tupleGen(intGen(-10, 10), intGen(-10, 10), intGen(-10, 10));
 
-      var distProp = distributiveProperty("multiplication over addition", gen,
-        proc(a: int, b: int) { return a * b; },
-        proc(a: int, b: int) { return a + b; });
+      var distProp = property("multiplication distributes over addition", gen3,
+        proc(args: (int, int, int)) { const (a, b, c) = args; return intDistributive(a, b, c); });
       var result = check(distProp);
       printResult(result.passed, distProp.name, result.numTests);
     }
@@ -83,29 +86,31 @@ module AlgebraicProperties {
     writeln("-" * 40);
 
     {
-      var gen = intGen(-100, 100);
+      var gen = tupleGen(intGen(-100, 100), intGen(-100, 100));
 
       // max is commutative
-      var maxCommProp = commutativeProperty("max", gen,
-        proc(a: int, b: int) { return max(a, b); });
+      var maxCommProp = property("max is commutative", gen,
+        proc(args: (int, int)) { const (a, b) = args; return maxCommutative(a, b); });
       var result1 = check(maxCommProp);
       printResult(result1.passed, maxCommProp.name, result1.numTests);
 
       // max is associative
-      var maxAssocProp = associativeProperty("max", gen,
-        proc(a: int, b: int) { return max(a, b); });
+      var gen3 = tupleGen(intGen(-100, 100), intGen(-100, 100), intGen(-100, 100));
+      var maxAssocProp = property("max is associative", gen3,
+        proc(args: (int, int, int)) { const (a, b, c) = args; return maxAssociative(a, b, c); });
       var result2 = check(maxAssocProp);
       printResult(result2.passed, maxAssocProp.name, result2.numTests);
 
       // min is commutative
-      var minCommProp = commutativeProperty("min", gen,
-        proc(a: int, b: int) { return min(a, b); });
+      var minCommProp = property("min is commutative", gen,
+        proc(args: (int, int)) { const (a, b) = args; return minCommutative(a, b); });
       var result3 = check(minCommProp);
       printResult(result3.passed, minCommProp.name, result3.numTests);
 
       // Idempotence: max(a, a) = a
-      var idempProp = idempotentProperty("max(x, x)", gen,
-        proc(x: int) { return max(x, x); });
+      var gen1 = intGen(-100, 100);
+      var idempProp = property("max is idempotent", gen1,
+        proc(a: int) { return maxIdempotent(a); });
       var result4 = check(idempProp);
       printResult(result4.passed, idempProp.name, result4.numTests);
     }
