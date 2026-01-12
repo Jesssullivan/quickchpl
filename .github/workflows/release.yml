@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     name: Create GitHub Release
@@ -57,15 +60,15 @@ jobs:
 
             #### Manual
             ```bash
-            git clone https://github.com/Jesssullivan/chplcheck.git
+            git clone https://github.com/Jesssullivan/quickchpl.git
             git checkout v${{ steps.version.outputs.version }}
-            export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:$PWD/chplcheck/src
+            export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:$PWD/quickchpl/src
             ```
 
             ### Documentation
-            - [README](https://github.com/Jesssullivan/chplcheck/blob/main/README.md)
-            - [Examples](https://github.com/Jesssullivan/chplcheck/tree/main/examples)
-            - [API Documentation](https://github.com/Jesssullivan/chplcheck/tree/main/docs)
+            - [README](https://github.com/Jesssullivan/quickchpl/blob/main/README.md)
+            - [Examples](https://github.com/Jesssullivan/quickchpl/tree/main/examples)
+            - [API Documentation](https://github.com/Jesssullivan/quickchpl/tree/main/docs)
 
           draft: false
           prerelease: false
