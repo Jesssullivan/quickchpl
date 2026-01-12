@@ -1,11 +1,11 @@
 [brick]
 name = "quickchpl"
-version = "1.0.0"
+version = "1.0.1"
 type = "library"
 chplVersion = "2.6.0..2.8.0"
 license = "MIT"
 authors = ["Jess Sullivan <jess@sulliwood.org>"]
-repository = "https://github.com/Jesssullivan/chplcheck"
+repository = "https://github.com/Jesssullivan/quickchpl"
 description = "A simple property-based testing library for Chapel"
 keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
 

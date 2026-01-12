@@ -90,7 +90,7 @@ module quickchpl {
   */
 
   /* Full semantic version string. */
-  param VERSION = "1.0.0";
+  param VERSION = "1.0.1";
 
   /* Major version number. */
   param VERSION_MAJOR = 1;
@@ -99,7 +99,7 @@ module quickchpl {
   param VERSION_MINOR = 0;
 
   /* Patch version number. */
-  param VERSION_PATCH = 0;
+  param VERSION_PATCH = 1;
 
   /*
     Quick property check with default configuration.
