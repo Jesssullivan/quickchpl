@@ -1,6 +1,4 @@
 #!/bin/bash
-# Setup Local Mason Development Environment for quickchpl
-# This script creates a local Mason registry for rapid iteration
 
 set -euo pipefail
 
@@ -12,13 +10,10 @@ LOCAL_REGISTRY="$HOME/mason-local-dev"
 echo "=== Setting up Local Mason Development Environment ==="
 echo ""
 
-# 1. Create local registry structure
 echo "Creating local registry at $LOCAL_REGISTRY..."
 mkdir -p "$LOCAL_REGISTRY/Bricks/$PROJECT_NAME"
 cd "$LOCAL_REGISTRY"
 
-# 2. Create registry manifest with local source path
-echo "Creating registry manifest..."
 cat > "Bricks/$PROJECT_NAME/$VERSION.toml" <<EOF
 [brick]
 name = "$PROJECT_NAME"
@@ -37,14 +32,12 @@ EOF
 
 echo "✓ Created registry manifest at Bricks/$PROJECT_NAME/$VERSION.toml"
 
-# 3. Initialize git repository if needed
 if [ ! -d ".git" ]; then
     echo "Initializing git repository..."
     git init
     echo "✓ Initialized git repository"
 fi
 
-# 4. Commit manifest
 git add "Bricks/$PROJECT_NAME/$VERSION.toml"
 if git diff --cached --quiet; then
     echo "✓ Manifest already committed"
@@ -53,7 +46,6 @@ else
     echo "✓ Committed manifest"
 fi
 
-# 5. Configure environment
 SHELL_RC="$HOME/.zshrc"
 if [ ! -f "$SHELL_RC" ]; then
     SHELL_RC="$HOME/.bashrc"
