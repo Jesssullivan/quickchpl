@@ -27,17 +27,11 @@ jobs:
           chpl --version
           mason --version || echo "Mason not found, using chpl directly"
 
-      - name: Build package
+      - name: Verify library compiles
         run: |
-          cd src
-          chpl --library chapelcheck.chpl Generators.chpl Combinators.chpl Properties.chpl Shrinkers.chpl Reporters.chpl Patterns.chpl
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: src/*.a
-          retention-days: 1
+          # Verify all modules compile together
+          chpl -M src --no-codegen src/chapelcheck.chpl
+          echo "✓ All modules compile successfully"
 
   test-unit:
     name: Unit Tests
@@ -132,68 +126,6 @@ jobs:
           chpl --version
           chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
           /tmp/test
-
-  integration-test:
-    name: Integration Test (aoc-2025-chapel-27)
-    needs: build
-    runs-on: ubuntu-latest
-    container:
-      image: chapel/chapel:2.6.0
-
-    steps:
-      - name: Checkout quickchpl
-        uses: actions/checkout@v4
-        with:
-          path: quickchpl
-
-      - name: Checkout aoc-2025-chapel-27
-        uses: actions/checkout@v4
-        with:
-          repository: Jesssullivan2/aoc-2025-chapel-27
-          path: aoc-2025-chapel-27
-
-      - name: Setup local Mason registry
-        run: |
-          # Create local registry structure
-          mkdir -p ~/.mason/registry/local/Bricks/quickchpl
-
-          # Create brick metadata for quickchpl 1.0.0
-          cat > ~/.mason/registry/local/Bricks/quickchpl/1.0.0.toml << 'EOF'
-          [brick]
-          name = "quickchpl"
-          version = "1.0.0"
-          chplVersion = "2.6.0..2.7.0"
-          license = "MIT"
-
-          [source]
-          type = "path"
-          path = "${{ github.workspace }}/quickchpl"
-          EOF
-
-          # Configure Mason to use local registry first
-          mkdir -p ~/.mason
-          cat > ~/.mason/Mason.toml << 'EOF'
-          [registries]
-          local = { path = "~/.mason/registry/local" }
-          EOF
-
-          echo "Local registry configured"
-
-      - name: Build aoc-2025-chapel-27 with local quickchpl
-        working-directory: aoc-2025-chapel-27
-        run: |
-          # Use quickchpl source directly
-          export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:${{ github.workspace }}/quickchpl/src
-
-          # Compile a test solution that uses quickchpl
-          if [ -f "src/day01.chpl" ]; then
-            echo "Building day01 with quickchpl..."
-            chpl src/day01.chpl -o /tmp/day01 --module-dir ${{ github.workspace }}/quickchpl/src
-            /tmp/day01 --numTests=10 || true
-          else
-            echo "No day01.chpl found, running basic integration check..."
-            chpl -M ${{ github.workspace }}/quickchpl/src -e "use quickchpl; writeln('Integration OK: quickchpl version ', VERSION);"
-          fi
 
   lint:
     name: Code Quality

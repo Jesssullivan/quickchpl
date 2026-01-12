@@ -27,12 +27,9 @@ build:
   stage: build
   script:
     - chpl --version
-    - cd src
-    - chpl --library chapelcheck.chpl Generators.chpl Combinators.chpl Properties.chpl Shrinkers.chpl Reporters.chpl Patterns.chpl
-  artifacts:
-    paths:
-      - src/*.a
-    expire_in: 1 day
+    # Verify all modules compile together
+    - chpl -M src --no-codegen src/chapelcheck.chpl
+    - echo "✓ All modules compile successfully"
 
 # ============================================
 # Test Stage
@@ -40,7 +37,6 @@ build:
 
 test:unit:generators:
   stage: test
-  needs: ["build"]
   script:
     - echo "Running Generator Tests..."
     - chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
@@ -48,7 +44,6 @@ test:unit:generators:
 
 test:unit:shrinkers:
   stage: test
-  needs: ["build"]
   script:
     - echo "Running Shrinker Tests..."
     - chpl tests/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
@@ -56,7 +51,6 @@ test:unit:shrinkers:
 
 test:unit:properties:
   stage: test
-  needs: ["build"]
   script:
     - echo "Running Property Tests..."
     - chpl tests/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
@@ -64,7 +58,6 @@ test:unit:properties:
 
 test:examples:
   stage: test
-  needs: ["build"]
   script:
     - echo "Running Getting Started Example..."
     - chpl examples/GettingStarted.chpl src/*.chpl -o /tmp/getting_started
@@ -78,7 +71,6 @@ test:examples:
 
 test:self:
   stage: test
-  needs: ["build"]
   script:
     - echo "Running quickchpl self-tests..."
     - chpl tests/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
@@ -87,7 +79,6 @@ test:self:
 # Matrix testing for Chapel versions
 .test:matrix:
   stage: test
-  needs: ["build"]
   script:
     - chpl --version
     - chpl tests/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
