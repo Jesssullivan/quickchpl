@@ -17,6 +17,11 @@ module CustomGenerators {
     proc distance(): real {
       return sqrt((x * x + y * y): real);
     }
+
+    // Required for quickchpl to stringify counterexamples
+    proc writeThis(f) throws {
+      f.write("Point(", x, ", ", y, ")");
+    }
   }
 
   // Custom generator for Point using composition
@@ -41,6 +46,11 @@ module CustomGenerators {
 
     proc perimeter(): int {
       return 2 * (width + height);
+    }
+
+    // Required for quickchpl to stringify counterexamples
+    proc writeThis(f) throws {
+      f.write("Rectangle(", width, " x ", height, ")");
     }
   }
 

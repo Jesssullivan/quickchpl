@@ -39,6 +39,7 @@ module Properties {
   use Random;
   use List;
   use Time;
+  use IO;
 
   /*
     Configuration Constants
@@ -279,7 +280,8 @@ module Properties {
           } else {
             failed += 1;
             if !hasFailure {
-              firstFailure = testCase: string;
+              try { firstFailure = "%?".format(testCase); }
+              catch { firstFailure = "<value>"; }
               hasFailure = true;
             }
             if verboseMode then writeln("  Test ", i, ": FAIL - ", testCase);
@@ -289,7 +291,8 @@ module Properties {
         } catch e {
           failed += 1;
           if !hasFailure {
-            firstFailure = testCase: string + " (exception: " + e.message() + ")";
+            try { firstFailure = "%? (exception: %s)".format(testCase, e.message()); }
+            catch { firstFailure = "<value> (exception: " + e.message() + ")"; }
             hasFailure = true;
           }
           if verboseMode then writeln("  Test ", i, ": EXCEPTION - ", e.message());
