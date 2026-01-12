@@ -1,0 +1,28 @@
+{
+  "env": {
+    "CHPL_HOME": "/opt/chapel",
+    "CHPL_REGEXP": "re2",
+    "CHPL_RE2": "bundled"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(mason:*)",
+      "Bash(chpl:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git tag:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(which:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)"
+    ]
+  },
+  "includeCoAuthoredBy": false
+}

@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION="manual-$(date +%Y%m%d)"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            CHANGES=$(sed -n "/## \[${{ steps.version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | sed '$d' || echo "Release ${{ steps.version.outputs.version }}")
+          else
+            CHANGES="Release ${{ steps.version.outputs.version }}"
+          fi
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## quickchpl ${{ steps.version.outputs.version }}
+
+            ${{ steps.changelog.outputs.changes }}
+
+            ### Installation
+
+            #### Via Mason (Recommended)
+            ```bash
+            mason add quickchpl@${{ steps.version.outputs.version }}
+            ```
+
+            #### Manual
+            ```bash
+            git clone https://github.com/Jesssullivan/chplcheck.git
+            git checkout v${{ steps.version.outputs.version }}
+            export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:$PWD/chplcheck/src
+            ```
+
+            ### Documentation
+            - [README](https://github.com/Jesssullivan/chplcheck/blob/main/README.md)
+            - [Examples](https://github.com/Jesssullivan/chplcheck/tree/main/examples)
+            - [API Documentation](https://github.com/Jesssullivan/chplcheck/tree/main/docs)
+
+          draft: false
+          prerelease: false
+
+  publish-instructions:
+    name: Display Mason Publish Instructions
+    needs: create-release
+    runs-on: ubuntu-latest
+    container:
+      image: chapel/chapel:2.6.0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Display publish instructions
+        run: |
+          echo "=========================================="
+          echo "Mason Registry Publication Instructions"
+          echo "=========================================="
+          echo ""
+          echo "To publish quickchpl to the Mason registry:"
+          echo ""
+          echo "1. Automated (recommended):"
+          echo "   mason publish"
+          echo ""
+          echo "2. Manual PR:"
+          echo "   a. Fork https://github.com/chapel-lang/mason-registry"
+          echo "   b. Create Bricks/quickchpl/$VERSION.toml"
+          echo "   c. Add source field pointing to GitHub"
+          echo "   d. Submit PR"
+          echo ""
+          echo "3. Verify package:"
+          echo "   mason build"
+          echo "   mason test"
+          echo "   mason publish --check"
+          echo ""
+          echo "=========================================="

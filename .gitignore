@@ -1,0 +1,39 @@
+# IDE
+.idea/
+.vscode/
+
+# OS
+**/.DS_Store
+.DS_Store
+
+# Build artifacts
+target/
+*.o
+*.tmp
+*.tmp_*
+
+# Compiled binaries (from src/)
+/Combinators
+/Generators
+/Patterns
+/Properties
+/Reporters
+/Shrinkers
+/chapelcheck
+
+# Example executables
+/examples/AlgebraicProperties
+/examples/CustomGenerators
+/examples/GettingStarted
+
+# Test executables
+/tests/unit/GeneratorTests
+/tests/unit/PropertyTests
+/tests/unit/ShrinkerTests
+/tests/properties/SelfTests
+
+# Docs (local Chapel docs)
+docs/chapel-2.6/
+
+# Mason lock (decision: track it for reproducibility)
+# Mason.lock
