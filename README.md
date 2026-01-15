@@ -9,13 +9,6 @@
 Inspired by QuickCheck and my father ^w^
 
 
-Manual installation:
-```bash
-# clone
-export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:$PWD/quickchpl/src
-```
-
-
 ```chapel
 use quickchpl;
 
@@ -277,6 +270,11 @@ property_tests:
 
 
 ## Configuration
+
+
+```bash
+export CHPL_MODULE_PATH=$CHPL_MODULE_PATH:$PWD/quickchpl/src
+```
 
 ```bash
 ./my_tests --numTests=1000 --maxShrinkSteps=500 --verbose=true

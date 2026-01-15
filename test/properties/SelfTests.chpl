@@ -5,6 +5,13 @@ module SelfTests {
   use quickchpl;
   use List;
 
+  // Helper procs for property tests (intentionally ignore formal)
+  @chplcheck.ignore("UnusedFormal")
+  proc alwaysTrue(x: int) { return true; }
+
+  @chplcheck.ignore("UnusedFormal")
+  proc alwaysFalse(x: int) { return false; }
+
   proc main() {
     writeln("quickchpl Self-Tests (PBT on PBT!)");
     writeln("=" * 50);
@@ -105,7 +112,8 @@ module SelfTests {
         "zip produces valid pairs",
         zippedGen,
         proc(pair: (int, int)) {
-          return pair(0) >= 0 && pair(0) <= 50 && pair(1) >= 100 && pair(1) <= 150;
+          return pair(0) >= 0 && pair(0) <= 50 &&
+                 pair(1) >= 100 && pair(1) <= 150;
         }
       );
       var result = check(prop);
@@ -199,12 +207,12 @@ module SelfTests {
     {
       // A property that always passes should report passed=true
       var passingGen = intGen(-100, 100);
-      var passingProp = property("always true", passingGen, proc(x: int) { return true; });
+      var passingProp = property("always true", passingGen, alwaysTrue);
       var passingResult = check(passingProp, 50);
 
       // A property that always fails should report passed=false
       var failingGen = intGen(1, 100);
-      var failingProp = property("always false", failingGen, proc(x: int) { return false; });
+      var failingProp = property("always false", failingGen, alwaysFalse);
       var failingResult = check(failingProp, 50);
 
       if passingResult.passed && !failingResult.passed {

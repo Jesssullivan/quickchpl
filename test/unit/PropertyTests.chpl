@@ -7,6 +7,13 @@ module PropertyTests {
 
   config const numTests = 50;
 
+  // Helper procs for property tests (intentionally ignore formal)
+  @chplcheck.ignore("UnusedFormal")
+  proc alwaysTrue(x: int) { return true; }
+
+  @chplcheck.ignore("UnusedFormal")
+  proc alwaysFalse(x: int) { return false; }
+
   proc main() {
     writeln("quickchpl Property System Unit Tests");
     writeln("=" * 50);
@@ -19,11 +26,7 @@ module PropertyTests {
     writeln("Testing Basic Property (always passes):");
     {
       var gen = intGen(-100, 100);
-      var prop = property(
-        "integers exist",
-        gen,
-        proc(x: int) { return true; }
-      );
+      var prop = property("integers exist", gen, alwaysTrue);
 
       var result = check(prop, numTests);
 
@@ -137,7 +140,8 @@ module PropertyTests {
         failed += 1;
       }
 
-      var failResult = quickCheck(intGen(1, 100), proc(x: int) { return x < 0; });
+      var failResult = quickCheck(intGen(1, 100),
+        proc(x: int) { return x < 0; });
       if !failResult {
         writeln("  ✓ quickCheck correctly returns false for failing property");
         passed += 1;
@@ -155,7 +159,9 @@ module PropertyTests {
       var prop = property(
         "addition is commutative",
         gen,
-        proc(pair: (int, int)) { return pair(0) + pair(1) == pair(1) + pair(0); }
+        proc(pair: (int, int)) {
+          return pair(0) + pair(1) == pair(1) + pair(0);
+        }
       );
 
       var result = check(prop, numTests);
@@ -196,7 +202,8 @@ module PropertyTests {
     writeln("Testing TestResult Structure:");
     {
       var gen = intGen(0, 10);
-      var prop = property("test property", gen, proc(x: int) { return x >= 0; });
+      var prop = property("test property", gen,
+        proc(x: int) { return x >= 0; });
       var result = check(prop, 25);
 
       if result.propertyName == "test property" {
@@ -222,10 +229,10 @@ module PropertyTests {
     {
       var results: list(TestResult);
 
-      var r1 = new TestResult(passed=true, numTests=10, numPassed=10, numFailed=0,
-                               propertyName="p1");
-      var r2 = new TestResult(passed=true, numTests=10, numPassed=10, numFailed=0,
-                               propertyName="p2");
+      var r1 = new TestResult(passed=true, numTests=10,
+        numPassed=10, numFailed=0, propertyName="p1");
+      var r2 = new TestResult(passed=true, numTests=10,
+        numPassed=10, numFailed=0, propertyName="p2");
       results.pushBack(r1);
       results.pushBack(r2);
 
@@ -237,8 +244,8 @@ module PropertyTests {
         failed += 1;
       }
 
-      var r3 = new TestResult(passed=false, numTests=10, numPassed=5, numFailed=5,
-                               propertyName="p3");
+      var r3 = new TestResult(passed=false, numTests=10,
+        numPassed=5, numFailed=5, propertyName="p3");
       results.pushBack(r3);
 
       if !allPassed(results) {

@@ -24,7 +24,7 @@ module GeneratorTests {
       var sawDifferent = false;
       var first = gen.next();
 
-      for i in 1..numTests {
+      for 1..numTests {
         const value = gen.next();
         if value < -100 || value > 100 then inRange = false;
         if value != first then sawDifferent = true;
@@ -54,7 +54,7 @@ module GeneratorTests {
       var gen = realGen(0.0, 1.0, Distribution.Uniform, seed);
       var inRange = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const value = gen.next();
         if value < 0.0 || value >= 1.0 then inRange = false;
       }
@@ -76,7 +76,7 @@ module GeneratorTests {
       var trueCount = 0;
       var falseCount = 0;
 
-      for i in 1..1000 {
+      for 1..1000 {
         if gen.next() then trueCount += 1;
         else falseCount += 1;
       }
@@ -84,7 +84,8 @@ module GeneratorTests {
       // With p=0.5, expect roughly 50% each (allow 30-70%)
       const trueRatio = trueCount: real / 1000.0;
       if trueRatio >= 0.3 && trueRatio <= 0.7 {
-        writeln("  ✓ Reasonable true/false distribution (", trueCount, "/", falseCount, ")");
+        writeln("  ✓ Reasonable true/false distribution (",
+                trueCount, "/", falseCount, ")");
         passed += 1;
       } else {
         writeln("  ✗ Biased distribution (", trueCount, "/", falseCount, ")");
@@ -100,7 +101,7 @@ module GeneratorTests {
       var validLength = true;
       var validChars = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const value = gen.next();
         if value.size < 5 || value.size > 10 then validLength = false;
         for c in value {
@@ -132,7 +133,7 @@ module GeneratorTests {
       var gen = tupleGen(intGen(0, 10, seed), intGen(100, 200, seed + 1));
       var valid = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const (a, b) = gen.next();
         if a < 0 || a > 10 then valid = false;
         if b < 100 || b > 200 then valid = false;
@@ -154,7 +155,7 @@ module GeneratorTests {
       var gen = listGen(intGen(0, 10, seed), 3, 7, seed);
       var validSizes = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const lst = gen.next();
         if lst.size < 3 || lst.size > 7 then validSizes = false;
       }
@@ -175,7 +176,7 @@ module GeneratorTests {
       var gen = constantGen(42);
       var allSame = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         if gen.next() != 42 then allSame = false;
       }
 
@@ -196,7 +197,7 @@ module GeneratorTests {
       var doubledGen = map(baseGen, proc(x: int) { return x * 2; });
       var allEven = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const value = doubledGen.next();
         if value % 2 != 0 then allEven = false;
       }
@@ -218,7 +219,7 @@ module GeneratorTests {
       var positiveGen = filter(baseGen, proc(x: int) { return x > 0; });
       var allPositive = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const value = positiveGen.next();
         if value <= 0 then allPositive = false;
       }
@@ -241,7 +242,7 @@ module GeneratorTests {
       var zippedGen = zipGen(gen1, gen2);
       var valid = true;
 
-      for i in 1..numTests {
+      for 1..numTests {
         const (n, s) = zippedGen.next();
         if n < 0 || n > 10 then valid = false;
         if s.size < 1 || s.size > 3 then valid = false;

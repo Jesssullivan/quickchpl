@@ -52,9 +52,9 @@ lint:chplcheck:
       echo ""
 
       # Known acceptable violations:
-      # - 8 CamelCaseRecords (generator types - intentional API)
+      # - 6 CamelCaseRecords (generator types - intentional API)
       # - 1 PascalCaseModules (quickchpl - package name)
-      ACCEPTABLE=9
+      ACCEPTABLE=7
 
       if [ "$VIOLATIONS" -gt "$ACCEPTABLE" ]; then
         echo "❌ Too many chplcheck violations (expected <=$ACCEPTABLE, got $VIOLATIONS)"

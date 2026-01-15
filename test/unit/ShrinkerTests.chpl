@@ -228,7 +228,8 @@ module ShrinkerTests {
     {
       // Property that fails for numbers >= 10
       // Should shrink to 10
-      const (shrunk, steps) = shrinkIntFailure(100, proc(x: int) { return x < 10; });
+      const (shrunk, steps) = shrinkIntFailure(100,
+        proc(x: int) { return x < 10; });
 
       if shrunk == 10 {
         writeln("  ✓ Shrinks 100 to 10 (minimal failing case)");
