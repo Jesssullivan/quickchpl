@@ -321,11 +321,17 @@ var result = runner.check(prop);
 
 
 
+
 ### Todos & Future work:
 - [x] Integrate with Chapel Mason package repo (in progress)
 - [ ] Integrate Outbot Harness 
 - [x] Integrate with (and `[ ]` publish) sister projects, `chapel-k8s-mail`, `chapel-git`, `tinymachines`, `mariolex`)
-- [x] Add IDE and LLM friendly text and code completions (docs in the works)
+- [ ] Add IDE and LLM friendly text and code completions (docs in the works)
 - [x] Provide public demo (`aoc-2025` **done! one is good for now**)
 
+---
 
+### Notes:
+- `module include statements are not yet stable` <-- this is expected
+- `list.parSafe is unstable` <-- this is expected
+- `use of routines as values is unstable` <-- routines are necessary AFAICT to achieve this familiar PBT structure

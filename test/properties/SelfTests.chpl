@@ -2,11 +2,7 @@
 // quickchpl testing itself using property-based testing!
 
 module SelfTests {
-  use Generators;
-  use Combinators;
-  use Properties;
-  use Shrinkers;
-  use Patterns;
+  use quickchpl;
   use List;
 
   proc main() {

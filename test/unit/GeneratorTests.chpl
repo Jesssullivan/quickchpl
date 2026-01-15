@@ -2,8 +2,7 @@
 // Tests for the generator framework
 
 module GeneratorTests {
-  use Generators;
-  use Combinators;
+  use quickchpl;
   use List;
 
   config const numTests = 100;

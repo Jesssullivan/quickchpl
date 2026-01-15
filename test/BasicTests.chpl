@@ -18,7 +18,7 @@ proc main() {
     writeln("Test 1: Integer generator range");
     var gen = intGen(0, 100);
     var allInRange = true;
-    for _unused in 1..20 {
+    for 1..20 {
       var val = gen.next();
       if val < 0 || val > 100 {
         allInRange = false;
@@ -40,7 +40,7 @@ proc main() {
     var gen = boolGen();
     var sawTrue = false;
     var sawFalse = false;
-    for _unused in 1..50 {
+    for 1..50 {
       var val = gen.next();
       if val then sawTrue = true;
       else sawFalse = true;

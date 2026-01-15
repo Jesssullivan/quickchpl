@@ -2,7 +2,7 @@
 // Tests for the shrinking engine
 
 module ShrinkerTests {
-  use Shrinkers;
+  use quickchpl;
   use List;
 
   proc main() {

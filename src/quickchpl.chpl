@@ -75,13 +75,19 @@ module quickchpl {
   /* Random seed (-1 for random, or positive int for reproducibility). */
   config const seed = -1;
 
-  // Public API: Re-export core modules
+  // Public API: Include and re-export core modules
+  include module Generators;
   public use Generators;
+  include module Properties;
   public use Properties;
+  include module Shrinkers;
   public use Shrinkers;
+  include module Reporters;
   public use Reporters;
-  public use Patterns;
+  include module Combinators;
   public use Combinators;
+  include module Patterns;
+  public use Patterns;
 
   /*
     Version Information
@@ -91,7 +97,7 @@ module quickchpl {
   */
 
   /* Full semantic version string. */
-  param VERSION = "1.0.1";
+  param VERSION = "1.0.2";
 
   /* Major version number. */
   param VERSION_MAJOR = 1;
@@ -100,7 +106,7 @@ module quickchpl {
   param VERSION_MINOR = 0;
 
   /* Patch version number. */
-  param VERSION_PATCH = 1;
+  param VERSION_PATCH = 2;
 
   /*
     Quick property check with default configuration.

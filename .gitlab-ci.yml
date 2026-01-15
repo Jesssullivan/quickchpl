@@ -29,7 +29,7 @@ build:
   script:
     - chpl --version
     # Verify all modules compile together
-    - chpl -M src --no-codegen src/quickchpl.chpl
+    - chpl -M src -M src/quickchpl --no-codegen src/quickchpl.chpl
     - echo "✓ All modules compile successfully"
 
 # ============================================
@@ -41,7 +41,7 @@ lint:chplcheck:
   script:
     - echo "Running chplcheck linter..."
     - chplcheck --version || echo "chplcheck version unknown"
-    - chplcheck src/*.chpl test/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
+    - chplcheck src/*.chpl src/quickchpl/*.chpl test/*.chpl test/**/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
     - cat chplcheck.log
     - |
       # Count violations (excluding intentional API design decisions)
@@ -53,9 +53,8 @@ lint:chplcheck:
 
       # Known acceptable violations:
       # - 8 CamelCaseRecords (generator types - intentional API)
-      # - 21 UnusedLoopIndex (_unused variable - Chapel limitation)
       # - 1 PascalCaseModules (quickchpl - package name)
-      ACCEPTABLE=30
+      ACCEPTABLE=9
 
       if [ "$VIOLATIONS" -gt "$ACCEPTABLE" ]; then
         echo "❌ Too many chplcheck violations (expected <=$ACCEPTABLE, got $VIOLATIONS)"
@@ -74,7 +73,7 @@ lint:whitespace:
   script:
     - echo "Checking for trailing whitespace..."
     - |
-      ! grep -rn '[[:space:]]$' src/*.chpl test/*.chpl examples/*.chpl || {
+      ! grep -rn '[[:space:]]$' src/*.chpl src/quickchpl/*.chpl test/*.chpl test/**/*.chpl examples/*.chpl || {
         echo "Found trailing whitespace"
         exit 1
       }
@@ -97,41 +96,41 @@ test:unit:generators:
   stage: test
   script:
     - echo "Running Generator Tests..."
-    - chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+    - chpl -M src -M src/quickchpl test/unit/GeneratorTests.chpl -o /tmp/generator_tests
     - /tmp/generator_tests
 
 test:unit:shrinkers:
   stage: test
   script:
     - echo "Running Shrinker Tests..."
-    - chpl test/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+    - chpl -M src -M src/quickchpl test/unit/ShrinkerTests.chpl -o /tmp/shrinker_tests
     - /tmp/shrinker_tests
 
 test:unit:properties:
   stage: test
   script:
     - echo "Running Property Tests..."
-    - chpl test/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+    - chpl -M src -M src/quickchpl test/unit/PropertyTests.chpl -o /tmp/property_tests
     - /tmp/property_tests
 
 test:examples:
   stage: test
   script:
     - echo "Running Getting Started Example..."
-    - chpl examples/GettingStarted.chpl src/*.chpl -o /tmp/getting_started
+    - chpl -M src -M src/quickchpl examples/GettingStarted.chpl -o /tmp/getting_started
     - /tmp/getting_started
     - echo "Running Algebraic Properties Example..."
-    - chpl examples/AlgebraicProperties.chpl src/*.chpl -o /tmp/algebraic
+    - chpl -M src -M src/quickchpl examples/AlgebraicProperties.chpl -o /tmp/algebraic
     - /tmp/algebraic
     - echo "Running Custom Generators Example..."
-    - chpl examples/CustomGenerators.chpl src/*.chpl -o /tmp/custom_gen
+    - chpl -M src -M src/quickchpl examples/CustomGenerators.chpl -o /tmp/custom_gen
     - /tmp/custom_gen
 
 test:self:
   stage: test
   script:
     - echo "Running quickchpl self-tests..."
-    - chpl test/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
+    - chpl -M src -M src/quickchpl test/properties/SelfTests.chpl -o /tmp/self_tests
     - /tmp/self_tests --numTests=$QUICKCHPL_NUM_TESTS
 
 # Matrix testing for Chapel versions
@@ -139,7 +138,7 @@ test:self:
   stage: test
   script:
     - chpl --version
-    - chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
+    - chpl -M src -M src/quickchpl test/unit/GeneratorTests.chpl -o /tmp/test
     - /tmp/test
 
 test:chapel-2.6.0:
@@ -158,10 +157,10 @@ docs:chpldoc:
   stage: docs
   script:
     - mkdir -p docs/api
-    - cd src
-    - for file in *.chpl; do
+    - |
+      for file in src/quickchpl.chpl src/quickchpl/*.chpl; do
         echo "Generating docs for $file...";
-        chpldoc "$file" --output-dir ../docs/api || echo "Warning: chpldoc failed for $file";
+        chpldoc "$file" --output-dir docs/api || echo "Warning: chpldoc failed for $file";
       done
   artifacts:
     paths:

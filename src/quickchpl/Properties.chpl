@@ -263,7 +263,7 @@ module Properties {
       :arg prop: Property to test
       :returns: TestResult with pass/fail status and details
     */
-    proc ref check(ref prop: Property): TestResult {
+    proc ref check(ref prop: Property(?)): TestResult {
       const startTime = timeSinceEpoch().totalSeconds();
 
       var passed = 0;
@@ -347,7 +347,7 @@ module Properties {
         writeln("Failed: ", result.failureInfo);
       }
   */
-  proc check(ref prop: Property): TestResult {
+  proc check(ref prop: Property(?)): TestResult {
     var runner = new PropertyRunner();
     return runner.check(prop);
   }
@@ -359,7 +359,7 @@ module Properties {
     :arg n: Number of test cases
     :returns: TestResult with pass/fail status
   */
-  proc check(ref prop: Property, n: int): TestResult {
+  proc check(ref prop: Property(?), n: int): TestResult {
     var runner = new PropertyRunner(numTests = n);
     return runner.check(prop);
   }
@@ -422,7 +422,7 @@ module Properties {
       // Test will halt if property fails
       assertProperty(prop);
   */
-  proc assertProperty(ref prop: Property) {
+  proc assertProperty(ref prop: Property(?)) {
     const result = check(prop);
     if !result.passed {
       halt("Property failed: ", prop.name,
@@ -438,7 +438,7 @@ module Properties {
     :arg n: Number of test cases
     :throws: Halts if property fails
   */
-  proc assertProperty(ref prop: Property, n: int) {
+  proc assertProperty(ref prop: Property(?), n: int) {
     const result = check(prop, n);
     if !result.passed {
       halt("Property failed: ", prop.name,

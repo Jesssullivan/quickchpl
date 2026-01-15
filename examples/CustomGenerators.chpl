@@ -101,7 +101,7 @@ module CustomGenerators {
     }
 
     iter these(n: int = 100) ref : Color {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -212,7 +212,7 @@ module CustomGenerators {
       // Show distribution (not a property test, just informative)
       writeln("\n  Color distribution (100 samples):");
       var counts: [0..7] int;
-      for _unused in 1..100 {
+      for 1..100 {
         const c = gen.next();
         select c {
           when Color.Red do counts[0] += 1;

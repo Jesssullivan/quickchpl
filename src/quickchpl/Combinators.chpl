@@ -96,7 +96,7 @@ module Combinators {
       :yields: Transformed values
     */
     iter these(n: int = 100) ref : OutputType {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -186,7 +186,7 @@ module Combinators {
       :yields: Values matching predicate
     */
     iter these(n: int = 100) ref : OutputType {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -261,7 +261,7 @@ module Combinators {
       :yields: 2-tuples of values
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -340,7 +340,7 @@ module Combinators {
       :yields: 3-tuples of values
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -422,7 +422,7 @@ module Combinators {
       :yields: Values from randomly selected generators
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -492,7 +492,7 @@ module Combinators {
       :yields: Values from randomly selected generators
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -600,7 +600,7 @@ module Combinators {
       :yields: Values with weighted selection
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -700,7 +700,7 @@ module Combinators {
       :yields: Values with scaled size
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }

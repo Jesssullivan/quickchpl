@@ -30,7 +30,7 @@ jobs:
       - name: Verify library compiles
         run: |
           # Verify all modules compile together
-          chpl -M src --no-codegen src/quickchpl.chpl
+          chpl -M src -M src/quickchpl --no-codegen src/quickchpl.chpl
           echo "✓ All modules compile successfully"
 
   test-unit:
@@ -47,19 +47,19 @@ jobs:
       - name: Run Generator Tests
         run: |
           echo "Running Generator Tests..."
-          chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/generator_tests
+          chpl -M src -M src/quickchpl test/unit/GeneratorTests.chpl -o /tmp/generator_tests
           /tmp/generator_tests
 
       - name: Run Shrinker Tests
         run: |
           echo "Running Shrinker Tests..."
-          chpl test/unit/ShrinkerTests.chpl src/*.chpl -o /tmp/shrinker_tests
+          chpl -M src -M src/quickchpl test/unit/ShrinkerTests.chpl -o /tmp/shrinker_tests
           /tmp/shrinker_tests
 
       - name: Run Property Tests
         run: |
           echo "Running Property Tests..."
-          chpl test/unit/PropertyTests.chpl src/*.chpl -o /tmp/property_tests
+          chpl -M src -M src/quickchpl test/unit/PropertyTests.chpl -o /tmp/property_tests
           /tmp/property_tests
 
   test-examples:
@@ -76,19 +76,19 @@ jobs:
       - name: Run Getting Started Example
         run: |
           echo "Running Getting Started Example..."
-          chpl examples/GettingStarted.chpl src/*.chpl -o /tmp/getting_started
+          chpl -M src -M src/quickchpl examples/GettingStarted.chpl -o /tmp/getting_started
           /tmp/getting_started
 
       - name: Run Algebraic Properties Example
         run: |
           echo "Running Algebraic Properties Example..."
-          chpl examples/AlgebraicProperties.chpl src/*.chpl -o /tmp/algebraic
+          chpl -M src -M src/quickchpl examples/AlgebraicProperties.chpl -o /tmp/algebraic
           /tmp/algebraic
 
       - name: Run Custom Generators Example
         run: |
           echo "Running Custom Generators Example..."
-          chpl examples/CustomGenerators.chpl src/*.chpl -o /tmp/custom_gen
+          chpl -M src -M src/quickchpl examples/CustomGenerators.chpl -o /tmp/custom_gen
           /tmp/custom_gen
 
   test-self:
@@ -104,7 +104,7 @@ jobs:
 
       - name: Run quickchpl self-tests
         run: |
-          chpl test/properties/SelfTests.chpl src/*.chpl -o /tmp/self_tests
+          chpl -M src -M src/quickchpl test/properties/SelfTests.chpl -o /tmp/self_tests
           /tmp/self_tests --numTests=${{ env.QUICKCHPL_NUM_TESTS }}
 
   test-matrix:
@@ -124,7 +124,7 @@ jobs:
       - name: Build with Chapel ${{ matrix.chapel-version }}
         run: |
           chpl --version
-          chpl test/unit/GeneratorTests.chpl src/*.chpl -o /tmp/test
+          chpl -M src -M src/quickchpl test/unit/GeneratorTests.chpl -o /tmp/test
           /tmp/test
 
   lint:
@@ -140,7 +140,7 @@ jobs:
         run: |
           echo "Running chplcheck linter..."
           chplcheck --version || echo "chplcheck version unknown"
-          chplcheck src/*.chpl test/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
+          chplcheck src/*.chpl src/quickchpl/*.chpl test/*.chpl test/**/*.chpl examples/*.chpl > chplcheck.log 2>&1 || true
           cat chplcheck.log
 
           # Count violations (excluding intentional API design decisions)
@@ -152,9 +152,8 @@ jobs:
 
           # Known acceptable violations:
           # - 8 CamelCaseRecords (generator types - intentional API)
-          # - 21 UnusedLoopIndex (_unused variable - Chapel limitation)
           # - 1 PascalCaseModules (quickchpl - package name)
-          ACCEPTABLE=30
+          ACCEPTABLE=9
 
           if [ "$VIOLATIONS" -gt "$ACCEPTABLE" ]; then
             echo "❌ Too many chplcheck violations (expected <=$ACCEPTABLE, got $VIOLATIONS)"
@@ -166,7 +165,7 @@ jobs:
       - name: Check for trailing whitespace
         run: |
           echo "Checking for trailing whitespace..."
-          ! grep -rn '[[:space:]]$' src/*.chpl test/*.chpl examples/*.chpl || {
+          ! grep -rn '[[:space:]]$' src/*.chpl src/quickchpl/*.chpl test/*.chpl test/**/*.chpl examples/*.chpl || {
             echo "Found trailing whitespace"
             exit 1
           }
@@ -190,10 +189,9 @@ jobs:
 
       - name: Generate documentation with chpldoc
         run: |
-          cd src
-          for file in *.chpl; do
+          for file in src/quickchpl.chpl src/quickchpl/*.chpl; do
             echo "Generating docs for $file..."
-            chpldoc "$file" --output-dir ../docs/api || echo "Warning: chpldoc failed for $file"
+            chpldoc "$file" --output-dir docs/api || echo "Warning: chpldoc failed for $file"
           done
 
       - name: Upload documentation artifacts

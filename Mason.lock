@@ -1,0 +1,14 @@
+
+[root]
+authors = ["Jess Sullivan <jess@sulliwood.org>"]
+chplVersion = "2.7.0..2.7.0"
+description = "A simple property-based testing library for Chapel"
+keywords = ["testing", "property-based", "quickcheck", "pbt", "fuzzing"]
+license = "MIT"
+name = "quickchpl"
+repository = "https://github.com/Jesssullivan/quickchpl"
+source = "https://github.com/Jesssullivan/quickchpl"
+type = "library"
+version = "1.0.2"
+
+

@@ -5,6 +5,43 @@ All notable changes to quickchpl will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-01-15
+
+### Fixed
+- Generic type warnings: Added `Property(?)` syntax for generic formal parameters
+- Unstable symbol warnings: Replaced `_unused` loop variables with bare `for 1..n` syntax
+- Mason main module check: Restructured to proper submodule convention
+
+### Changed
+- Moved submodules to `src/quickchpl/` directory per Mason package conventions
+- Updated `quickchpl.chpl` to use `include module` statements before `public use`
+- Test files now import via `use quickchpl` instead of direct submodule imports
+- CI acceptable violations reduced from 30 to 9 (removed UnusedLoopIndex)
+- Chapel version compatibility extended to 2.8.0
+
+### Infrastructure
+- Updated GitHub Actions and GitLab CI paths for new module structure
+- Fixed Mason.toml trailing newline (Mason bug workaround)
+
+[1.0.2]: https://github.com/Jesssullivan/quickchpl/releases/tag/v1.0.2
+
+## [1.0.1] - 2026-01-12
+
+### Fixed
+- README examples updated to match actual API signatures
+- Tuple destructuring syntax corrected for Chapel 2.6+
+- Removed references to non-existent Pattern template functions
+
+### Changed
+- Consolidated `tests/` directory to `test/` (Mason convention)
+- Added chplcheck linting integration to CI
+
+### Infrastructure
+- Added GitLab CI/CD configuration
+- Fixed release workflow permissions and URLs
+
+[1.0.1]: https://github.com/Jesssullivan/quickchpl/releases/tag/v1.0.1
+
 ## [1.0.0] - 2026-01-12
 
 ### Added

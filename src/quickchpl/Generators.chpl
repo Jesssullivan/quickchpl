@@ -164,7 +164,7 @@ module Generators {
       :yields: Random integers in [min, max]
     */
     iter these(n: int = 100) ref : int {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -313,7 +313,7 @@ module Generators {
       :yields: Random reals in [minVal, maxVal]
     */
     iter these(n: int = 100) ref : real {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -408,7 +408,7 @@ module Generators {
       :yields: Random boolean values
     */
     iter these(n: int = 100) ref : bool {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -491,7 +491,7 @@ module Generators {
       var result: string;
       const charsetLen = charset.size;
 
-      for _unused in 1..len {
+      for 1..len {
         const idx = abs(rng.next()) % charsetLen;
         result += charset[idx];
       }
@@ -506,7 +506,7 @@ module Generators {
       :yields: Random strings
     */
     iter these(n: int = 100) ref : string {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -620,7 +620,7 @@ module Generators {
       :yields: 2-tuples of generated values
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -662,7 +662,7 @@ module Generators {
       :yields: 3-tuples of generated values
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -762,7 +762,7 @@ module Generators {
                    else minSize + abs(rng.next()) % (maxSize - minSize + 1);
 
       var result: list(elemGen.next().type);
-      for _unused in 1..size {
+      for 1..size {
         result.pushBack(elemGen.next());
       }
       return result;
@@ -775,7 +775,7 @@ module Generators {
       :yields: Random lists
     */
     iter these(n: int = 100) ref {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
@@ -847,7 +847,7 @@ module Generators {
       :yields: The constant value
     */
     iter these(n: int = 100): T {
-      for _unused in 1..n {
+      for 1..n {
         yield value;
       }
     }
@@ -929,7 +929,7 @@ module Generators {
       :yields: Randomly selected elements
     */
     iter these(n: int = 100) ref : T {
-      for _unused in 1..n {
+      for 1..n {
         yield this.next();
       }
     }
