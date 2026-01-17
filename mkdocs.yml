@@ -1,0 +1,193 @@
+# mkdocs.yml - quickchpl Documentation Site Configuration
+# Property-Based Testing Framework for Chapel
+
+site_name: quickchpl
+site_url: https://jesssullivan.github.io/quickchpl/
+site_author: Jess Sullivan
+site_description: Property-Based Testing Framework for Chapel
+
+repo_name: Jesssullivan/quickchpl
+repo_url: https://github.com/Jesssullivan/quickchpl
+
+copyright: Copyright &copy; 2025 Jess Sullivan - MIT License
+
+# Theme Configuration
+theme:
+  name: material
+  custom_dir: docs/overrides
+  language: en
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    # Dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Light mode
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/test-tube
+
+# Extensions
+markdown_extensions:
+  # Code blocks with syntax highlighting
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  # SuperFences for advanced code blocks
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  # Tabbed content
+  - pymdownx.tabbed:
+      alternate_style: true
+  # Admonitions (notes, warnings, etc.)
+  - admonition
+  - pymdownx.details
+  # Task lists
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  # Keys (keyboard shortcuts)
+  - pymdownx.keys
+  # Emoji support
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  # Tables
+  - tables
+  - pymdownx.betterem
+  # Definition lists
+  - def_list
+  # Footnotes
+  - footnotes
+  # Table of Contents
+  - toc:
+      permalink: true
+      toc_depth: 3
+  # Attributes and linking
+  - attr_list
+  - md_in_html
+  # Math support (optional)
+  - pymdownx.arithmatex:
+      generic: true
+
+# Plugins
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - llmstxt:
+      full_output: llms-full.txt
+      markdown_description: |
+        quickchpl is a property-based testing framework for Chapel.
+        Provides generators for random data (intGen, realGen, boolGen, stringGen, tupleGen, listGen).
+        Define properties with property(), check with check() or quickCheck().
+        Automatic shrinking finds minimal counterexamples.
+        Built-in patterns: isCommutative, isAssociative, isIdempotent, isInvolution, isRoundTrip.
+        Zero dependencies - just Chapel 2.6+.
+      sections:
+        Getting Started:
+          - index.md
+          - getting-started/installation.md
+          - getting-started/quick-start.md
+          - getting-started/first-test.md
+        Core Concepts:
+          - concepts/generators.md
+          - concepts/properties.md
+          - concepts/shrinking.md
+        Modules:
+          - modules/overview.md
+          - modules/generators.md
+          - modules/properties.md
+          - modules/shrinkers.md
+          - modules/reporters.md
+          - modules/combinators.md
+          - modules/patterns.md
+        Examples:
+          - examples/basic.md
+          - examples/algebraic.md
+          - examples/custom-generators.md
+          - examples/integration.md
+        API Reference:
+          - api/index.md
+        Contributing:
+          - contributing/guidelines.md
+          - contributing/setup.md
+          - contributing/style.md
+  - minify:
+      minify_html: true
+
+# Navigation Structure
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+    - First Property Test: getting-started/first-test.md
+  - Core Concepts:
+    - Generators: concepts/generators.md
+    - Properties: concepts/properties.md
+    - Shrinking: concepts/shrinking.md
+  - Modules:
+    - Overview: modules/overview.md
+    - Generators: modules/generators.md
+    - Properties: modules/properties.md
+    - Shrinkers: modules/shrinkers.md
+    - Reporters: modules/reporters.md
+    - Combinators: modules/combinators.md
+    - Patterns: modules/patterns.md
+  - Examples:
+    - Basic Examples: examples/basic.md
+    - Algebraic Properties: examples/algebraic.md
+    - Custom Generators: examples/custom-generators.md
+    - Integration Testing: examples/integration.md
+  - API Reference:
+    - Full API: api/index.md
+  - Contributing:
+    - Guidelines: contributing/guidelines.md
+    - Development Setup: contributing/setup.md
+    - Code Style: contributing/style.md
+
+# Extra Configuration
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Jesssullivan/quickchpl
+    - icon: fontawesome/brands/gitlab
+      link: https://gitlab.com/tinyland/projects/quickchpl
+  generator: false
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js

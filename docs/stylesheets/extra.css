@@ -1,0 +1,94 @@
+/* quickchpl Documentation Custom Styles */
+
+:root {
+  --md-primary-fg-color: #7b68ee;
+  --md-accent-fg-color: #9370db;
+}
+
+/* Code blocks */
+.highlight code {
+  font-size: 0.85em;
+}
+
+/* Chapel syntax highlighting improvements */
+.highlight .k { color: #c678dd; }  /* keywords */
+.highlight .n { color: #abb2bf; }  /* names */
+.highlight .s { color: #98c379; }  /* strings */
+.highlight .c { color: #5c6370; }  /* comments */
+.highlight .m { color: #d19a66; }  /* numbers */
+
+/* Module cards on home page */
+.modules .module {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.modules .module:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Table styling */
+.md-typeset table:not([class]) {
+  font-size: 0.85em;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+/* Admonition customization */
+.md-typeset .admonition.success,
+.md-typeset details.success {
+  border-color: #4caf50;
+}
+
+.md-typeset .success > .admonition-title,
+.md-typeset .success > summary {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Navigation improvements */
+.md-nav__link {
+  font-size: 0.9em;
+}
+
+/* Footer */
+.md-footer {
+  margin-top: 2rem;
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+/* Grid cards for home page */
+.grid.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.grid.cards > * {
+  padding: 1rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 4px;
+}
+
+/* API reference table improvements */
+.api-table code {
+  font-size: 0.8em;
+  padding: 0.1em 0.3em;
+}
+
+/* Print styles */
+@media print {
+  .md-sidebar,
+  .md-header,
+  .md-footer {
+    display: none;
+  }
+}
